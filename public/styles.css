@@ -1,0 +1,187 @@
+/**
+ * SAARTHI AI — Emergency Operations Center (EOC) Styling
+ * Visual Design: Industrial Mission-Control Utilitarian with High-Contrast Status Indicators
+ */
+
+:root {
+  --bg-dark: #06090e;
+  --panel-bg: #0c1322;
+  --card-bg: #111a2e;
+  --border-subtle: #1a263e;
+  --border-focus: #06b6d4;
+  --color-emergency: #f43f5e;
+  --color-warning: #f59e0b;
+  --color-safe: #10b981;
+  --color-cyan: #06b6d4;
+  --color-indigo: #6366f1;
+}
+
+/* Background Subtle Tactical Grid */
+body {
+  background-color: var(--bg-dark);
+  background-image: 
+    radial-gradient(rgba(30, 41, 59, 0.25) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(6, 9, 14, 0.95), rgba(6, 9, 14, 0.98));
+  background-size: 24px 24px, 100% 100%;
+  color: #f1f5f9;
+}
+
+/* Tactical EOC Card */
+.eoc-card {
+  background: linear-gradient(180deg, #0d1527 0%, #090e1a 100%);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.eoc-card:hover {
+  border-color: rgba(30, 48, 80, 0.9);
+}
+
+/* Preset Pills */
+.preset-pill {
+  box-shadow: 0 2px 8px -1px rgba(0, 0, 0, 0.4);
+}
+
+.preset-pill:hover {
+  transform: translateY(-1px);
+}
+
+.preset-pill:active {
+  transform: translateY(0);
+}
+
+/* Focus Visible */
+button:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #090e1a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* Urgency Status Colors */
+.badge-immediate {
+  background-color: rgba(244, 63, 94, 0.18);
+  color: #fda4af;
+  border: 1px solid rgba(244, 63, 94, 0.5);
+  box-shadow: 0 0 12px rgba(244, 63, 94, 0.2);
+}
+
+.badge-high {
+  background-color: rgba(245, 158, 11, 0.18);
+  color: #fde68a;
+  border: 1px solid rgba(245, 158, 11, 0.5);
+}
+
+.badge-moderate {
+  background-color: rgba(6, 182, 212, 0.18);
+  color: #a5f3fc;
+  border: 1px solid rgba(6, 182, 212, 0.5);
+}
+
+.badge-low {
+  background-color: rgba(16, 185, 129, 0.18);
+  color: #a7f3d0;
+  border: 1px solid rgba(16, 185, 129, 0.5);
+}
+
+.badge-unclear {
+  background-color: rgba(100, 116, 139, 0.18);
+  color: #cbd5e1;
+  border: 1px solid rgba(100, 116, 139, 0.5);
+}
+
+/* Verification Badges */
+.status-verified {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.status-partially-verified {
+  background: rgba(6, 182, 212, 0.15);
+  color: #22d3ee;
+  border: 1px solid rgba(6, 182, 212, 0.4);
+}
+
+.status-unverified {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.status-contradicted {
+  background: rgba(244, 63, 94, 0.15);
+  color: #fb7185;
+  border: 1px solid rgba(244, 63, 94, 0.4);
+}
+
+.status-verification-unavailable {
+  background: rgba(148, 163, 184, 0.15);
+  color: #94a3b8;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+/* Action Directive Cards */
+.action-card {
+  background: #0d1527;
+  border: 1px solid #1a2744;
+  border-left: 3px solid #06b6d4;
+  transition: all 0.2s ease;
+}
+
+.action-card.action-critical {
+  border-left-color: #f43f5e;
+}
+
+.action-card.action-high {
+  border-left-color: #f59e0b;
+}
+
+.action-card:hover {
+  background: #111b33;
+  border-color: #2a3d66;
+}
+
+/* Pulse animation for active voice/recording */
+@keyframes voicePulse {
+  0% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.8; }
+}
+
+.recording-pulse {
+  animation: voicePulse 1.2s infinite ease-in-out;
+}
+
+/* Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "name": "saarthi-ai",
+  "version": "1.0.0",
+  "description": "SAARTHI AI — Universal Human Intent-to-System Action Engine powered by Gemini 2.5 Flash",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node --test tests/*.test.js",
+    "size": "node scripts/repo-size.js"
+  },
+  "keywords": [
+    "saarthi-ai",
+    "gemini-2.5-flash",
+    "emergency-response",
+    "intent-to-action",
+    "hackathon",
+    "public-good"
+  ],
+  "author": "SAARTHI AI Team",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
