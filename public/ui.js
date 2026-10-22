@@ -24,6 +24,7 @@ const UI = (() => {
     // Input Hub
     inputText: document.getElementById('input-text'),
     charCounter: document.getElementById('char-counter'),
+    contextSelect: document.getElementById('context-select'),
     micBtn: document.getElementById('mic-btn'),
     micIcon: document.getElementById('mic-icon'),
     micLabel: document.getElementById('mic-label'),
@@ -32,10 +33,11 @@ const UI = (() => {
     languageSelect: document.getElementById('language-select'),
     btnAnalyze: document.getElementById('btn-analyze'),
 
-    // Presets
+    // Competition Presets
+    presetCommunity: document.getElementById('preset-community'),
+    presetHealth: document.getElementById('preset-health'),
+    presetPublic: document.getElementById('preset-public'),
     presetMedical: document.getElementById('preset-medical'),
-    presetDisaster: document.getElementById('preset-disaster'),
-    presetPrescription: document.getElementById('preset-prescription'),
 
     // Image Upload
     dropArea: document.getElementById('drop-area'),
@@ -84,6 +86,7 @@ const UI = (() => {
     followUpText: document.getElementById('follow-up-text'),
     btnSimulate: document.getElementById('btn-simulate'),
     btnCopyPlan: document.getElementById('btn-copy-plan'),
+    btnExportFile: document.getElementById('btn-export-file'),
     btnCopyJson: document.getElementById('btn-copy-json'),
     simulationConsole: document.getElementById('simulation-console'),
     simulationLog: document.getElementById('simulation-log'),
@@ -468,10 +471,14 @@ const UI = (() => {
       elements.actionsList.appendChild(card);
     });
 
-    // 12. Follow-up Question
-    if (plan.follow_up_question) {
+    // 12. Follow-up Questions
+    const followUps = Array.isArray(plan.followUpQuestions) && plan.followUpQuestions.length > 0
+      ? plan.followUpQuestions
+      : (plan.follow_up_question ? [plan.follow_up_question] : []);
+
+    if (followUps.length > 0) {
       elements.followUpCard.classList.remove('hidden');
-      elements.followUpText.textContent = plan.follow_up_question;
+      elements.followUpText.textContent = followUps.join(' • ');
     } else {
       elements.followUpCard.classList.add('hidden');
     }
@@ -480,9 +487,13 @@ const UI = (() => {
     const cleanPayload = plan.rawSystemPayload || plan;
     elements.jsonPayloadDisplay.textContent = JSON.stringify(cleanPayload, null, 2);
 
-    // 14. Safety Note
-    if (plan.safety_note) {
-      elements.safetyNoteText.textContent = plan.safety_note;
+    // 14. Safety Notes
+    const safetyList = Array.isArray(plan.safetyNotes) && plan.safetyNotes.length > 0
+      ? plan.safetyNotes
+      : (plan.safety_note ? [plan.safety_note] : []);
+
+    if (safetyList.length > 0) {
+      elements.safetyNoteText.textContent = safetyList.join('\n\n');
     }
 
     // Unhide panels

@@ -131,6 +131,24 @@ test('validateAndNormalizeGeminiOutput downgrades unsupported claims to Verifica
   assert.strictEqual(normalized.actions[0].requiresHumanApproval, true);
   // Draft payload sent must be strictly false
   assert.strictEqual(normalized.draftPayloads[0].sent, false);
+  // safetyNotes and followUpQuestions must be arrays
+  assert.ok(Array.isArray(normalized.safetyNotes));
+  assert.ok(Array.isArray(normalized.followUpQuestions));
+});
+
+test('validateAnalyzeRequest accurately handles operational context', () => {
+  const reqWithContext = validateAnalyzeRequest({
+    text: 'Applying for disability pension scheme',
+    context: 'public_service'
+  });
+  assert.strictEqual(reqWithContext.isValid, true);
+  assert.strictEqual(reqWithContext.cleaned.context, 'public_service');
+
+  const reqWithDefault = validateAnalyzeRequest({
+    text: 'General inquiry message'
+  });
+  assert.strictEqual(reqWithDefault.isValid, true);
+  assert.strictEqual(reqWithDefault.cleaned.context, 'auto');
 });
 
 test('applyDeterministicEmergencyOverride forces Immediate urgency for cardiac and live wire markers', () => {

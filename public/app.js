@@ -315,17 +315,21 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.inputText.value = preset.inputText;
     updateCharCounter();
     elements.languageSelect.value = preset.language || 'en-IN';
+    if (elements.contextSelect && preset.context) {
+      elements.contextSelect.value = preset.context;
+    }
 
     // Highlight selected preset pill briefly
-    UI.showToast(`Loaded Preset: ${preset.name}`, 'info');
+    UI.showToast(`Loaded: ${preset.name}`, 'info');
     
     // Automatically trigger analysis for seamless hackathon judge exploration
     handleAnalyze();
   }
 
-  elements.presetMedical.addEventListener('click', () => loadPreset('medical_crisis'));
-  elements.presetDisaster.addEventListener('click', () => loadPreset('community_safety'));
-  elements.presetPrescription.addEventListener('click', () => loadPreset('health_prescription_navigator'));
+  if (elements.presetCommunity) elements.presetCommunity.addEventListener('click', () => loadPreset('community_safety'));
+  if (elements.presetHealth) elements.presetHealth.addEventListener('click', () => loadPreset('health_organization'));
+  if (elements.presetPublic) elements.presetPublic.addEventListener('click', () => loadPreset('public_service'));
+  if (elements.presetMedical) elements.presetMedical.addEventListener('click', () => loadPreset('medical_crisis'));
 
   // =========================================================================
   // 7. Primary Action: "Turn This Into a Plan"
@@ -353,6 +357,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const payload = {
         text,
         language: elements.languageSelect.value || 'en-IN',
+        context: elements.contextSelect ? elements.contextSelect.value : 'auto',
         mode: state.mode
       };
 
@@ -477,6 +482,63 @@ document.addEventListener('DOMContentLoaded', () => {
       UI.showToast('Failed to copy to clipboard.', 'error');
     }
   });
+
+  if (elements.btnExportFile) {
+    elements.btnExportFile.addEventListener('click', () => {
+      if (!state.currentPlan) {
+        UI.showToast('No active action plan to export.', 'warning');
+        return;
+      }
+
+      const p = state.currentPlan;
+      const mdContent = [
+        `# SAARTHI AI — Operational Action Briefing`,
+        `**Generated:** ${new Date().toISOString()}`,
+        `**Urgency:** ${p.urgency} | **Domain:** ${p.domain} | **Confidence:** ${Math.round((p.confidenceScore || 0.85) * 100)}%`,
+        ``,
+        `## Summary`,
+        `${p.summary}`,
+        ``,
+        `## 1. Intent Decoded`,
+        `- **Said:** "${p.intent?.said || ''}"`,
+        `- **Operational Intent:** ${p.intent?.trueIntent || ''}`,
+        ``,
+        `## 2. Immediate Physical Guidance`,
+        ...(p.humanGuidance || []).map((g, i) => `${i + 1}. ${g}`),
+        ``,
+        `## 3. Prioritized Action Directives`,
+        ...(p.actions || []).map((a, i) => `### Step ${i + 1}: ${a.step} [${a.priority}]\n- **Why:** ${a.why}\n- **Timing:** ${a.timing}\n- **Requires Human Approval:** ${a.requiresHumanApproval}`),
+        ``,
+        `## 4. Evidence & Grounding Verification`,
+        ...(p.verification || []).map((v, i) => `- **Claim ${i + 1}:** ${v.claim} [${v.status}]\n  - Explanation: ${v.explanation || v.evidenceExplanation || 'None'}\n  - URL: ${v.evidenceUrl || (v.evidence && v.evidence[0] ? v.evidence[0].url : 'N/A')}`),
+        ``,
+        `## 5. Known Facts & Critical Unknowns`,
+        `### Facts:`,
+        ...(p.facts || []).map(f => `- ${f}`),
+        `### Unknowns:`,
+        ...(p.unknowns || []).map(u => `- ${u}`),
+        `### Conflicts:`,
+        ...(p.conflicts || []).map(c => `- ${c}`),
+        ``,
+        `## Safety Notice & Disclaimers`,
+        `${(p.safetyNotes || [p.safety_note]).join('\n\n')}`,
+        ``,
+        `---`,
+        `*DRAFT PAYLOAD — NOT SENT TO ANY REAL SYSTEM • FOR HUMAN OPERATOR REVIEW ONLY*`
+      ].join('\n');
+
+      const blob = new Blob([mdContent], { type: 'text/markdown;charset=utf-8' });
+      const downloadUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      a.download = `saarthi-action-briefing-${Date.now().toString().slice(-4)}.md`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(downloadUrl);
+      UI.showToast('Action Plan downloaded as Markdown file!', 'success');
+    });
+  }
 
   // =========================================================================
   // 9. Simulation Execution Terminal

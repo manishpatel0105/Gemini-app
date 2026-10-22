@@ -77,12 +77,18 @@ function validateAnalyzeRequest(body) {
     errors.push('Language must be a string code (e.g. "en-IN", "hi-IN").');
   }
 
+  // Context validation (optional)
+  const allowedContexts = ['auto', 'community_safety', 'health_notes', 'public_service', 'traffic_civic', 'emergency_crisis'];
+  const rawContext = typeof body.context === 'string' ? body.context.trim().toLowerCase() : 'auto';
+  const context = allowedContexts.includes(rawContext) ? rawContext : 'auto';
+
   return {
     isValid: errors.length === 0,
     errors,
     cleaned: {
       text,
       language: body.language || 'en-IN',
+      context,
       mode: body.mode === 'demo' ? 'demo' : 'live'
     }
   };
@@ -134,10 +140,16 @@ function validateAndNormalizeGeminiOutput(raw, originalInput = '') {
   };
 
   // 3. Urgency
+  // 3. Urgency (Supports Immediate/High/Moderate/Low/Unclear and low/medium/high/emergency)
   let urgency = 'Unclear';
   if (typeof raw.urgency === 'string') {
-    const match = VALID_URGENCIES.find(u => u.toLowerCase() === raw.urgency.trim().toLowerCase());
-    if (match) urgency = match;
+    const uLower = raw.urgency.trim().toLowerCase();
+    if (uLower === 'emergency') urgency = 'Immediate';
+    else if (uLower === 'medium') urgency = 'Moderate';
+    else {
+      const match = VALID_URGENCIES.find(u => u.toLowerCase() === uLower);
+      if (match) urgency = match;
+    }
   }
   normalized.urgency = urgency;
 
@@ -207,11 +219,16 @@ function validateAndNormalizeGeminiOutput(raw, originalInput = '') {
         status = 'Verification unavailable';
       }
 
+      const primaryUrl = v.evidenceUrl || (evidenceList.length > 0 ? evidenceList[0].url : '') || '';
+      const explanationText = typeof v.explanation === 'string' ? v.explanation.trim() : (typeof v.evidenceExplanation === 'string' ? v.evidenceExplanation.trim() : '');
+
       normalized.verification.push({
         claim,
         status,
+        evidenceUrl: primaryUrl,
+        evidenceExplanation: explanationText,
         evidence: evidenceList,
-        explanation: typeof v.explanation === 'string' ? v.explanation.trim() : ''
+        explanation: explanationText
       });
     }
   }
@@ -302,14 +319,29 @@ function validateAndNormalizeGeminiOutput(raw, originalInput = '') {
     actionDirectives: normalized.draftPayloads
   };
 
-  // 14. Safety Note & Follow-up
-  normalized.safety_note = typeof raw.safety_note === 'string' && raw.safety_note.trim()
+  // 14. Safety Note & Follow-up (Supporting both safetyNotes array and safety_note string)
+  let safetyNoteStr = typeof raw.safety_note === 'string' && raw.safety_note.trim()
     ? raw.safety_note.trim()
-    : 'SAFETY ADVISORY: SAARTHI AI is an algorithmic decision-support tool, not a certified clinical diagnostician or public emergency dispatcher. Dial 112 in India for direct life-safety intervention.';
+    : 'SAFETY ADVISORY: SAARTHI AI is an information-assistance decision support tool, not an emergency service or licensed professional. Dial 112 in India for direct life-safety emergency dispatch.';
+  
+  let safetyNotesList = Array.isArray(raw.safetyNotes) && raw.safetyNotes.length > 0
+    ? raw.safetyNotes.map(String).filter(s => s.trim())
+    : [safetyNoteStr];
 
-  normalized.follow_up_question = typeof raw.follow_up_question === 'string' && raw.follow_up_question.trim()
+  normalized.safety_note = safetyNoteStr;
+  normalized.safetyNotes = safetyNotesList;
+
+  // Follow-up questions (Supporting both followUpQuestions array and follow_up_question string)
+  let followUpStr = typeof raw.follow_up_question === 'string' && raw.follow_up_question.trim()
     ? raw.follow_up_question.trim()
-    : 'Are there any other individuals in immediate physical danger at this location?';
+    : 'Are there any other critical details or immediate safety hazards at this location?';
+
+  let followUpList = Array.isArray(raw.followUpQuestions) && raw.followUpQuestions.length > 0
+    ? raw.followUpQuestions.map(String).filter(s => s.trim())
+    : [followUpStr];
+
+  normalized.follow_up_question = followUpStr;
+  normalized.followUpQuestions = followUpList;
 
   // Apply Deterministic Emergency Overrides
   return applyDeterministicEmergencyOverride(normalized, originalInput);
@@ -386,7 +418,9 @@ function applyDeterministicEmergencyOverride(analysis, inputText = '') {
     }
 
     // Safety note guarantee
-    analysis.safety_note = `DETERMINISTIC EMERGENCY SAFEGUARD ACTIVE: High-risk danger signals were detected in this report. Dial 112 / 108 immediately. Do not delay real-world medical or disaster response for AI output. SAARTHI AI does not perform clinical diagnosis, triage dispatch, or prescription authorization.`;
+    const overrideNote = `DETERMINISTIC EMERGENCY SAFEGUARD ACTIVE: High-risk danger signals were detected in this report. Dial 112 / 108 immediately. Do not delay real-world medical or disaster response for AI output. SAARTHI AI does not perform clinical diagnosis, triage dispatch, or prescription authorization.`;
+    analysis.safety_note = overrideNote;
+    analysis.safetyNotes = [overrideNote, ...(analysis.safetyNotes || [])];
   }
 
   return analysis;

@@ -1,19 +1,506 @@
 /**
- * SAARTHI AI — Demo Data Fixtures
+ * SAARTHI AI — Demo Data Fixtures (Competition Build)
  * High-fidelity, deterministic presets for judging and offline exploration.
  * Structured strictly according to the SAARTHI Intent-to-Action JSON Schema.
  * 
- * Works in both Node.js (for backend testing/fallback) and browser window environments.
+ * Includes the 3 official competition scenarios + emergency dispatch:
+ * A. Community Safety (Severe weather & blocked road report)
+ * B. Health Information Organization (Messy symptom notes & clinician question prep)
+ * C. Public-Service Navigation (Benefits application & fee exploitation prevention)
+ * D. Medical Crisis (Acute coronary syndrome / highway triage)
+ * 
+ * Works in both Node.js (for backend testing/fallback) and browser environments.
  */
 
 const DEMO_PRESETS = {
+  // ---------------------------------------------------------------------------
+  // SCENARIO A: Community Safety (Severe Weather & Blocked Road)
+  // ---------------------------------------------------------------------------
+  community_safety: {
+    id: "preset_community_safety",
+    name: "A. Community Safety",
+    category: "DISASTER",
+    subtitle: "Severe weather alert • Blocked underpass rumor vs eyewitness • Safe route check",
+    inputText: "WhatsApp forward received at 4:30 PM: 'URGENT: Red alert in Sector 14-18 belt! Main arterial underpass completely flooded with 4 feet water, large fallen neem tree crushed a streetlight and road is officially closed until tomorrow morning! Take bypass road through village.' But my colleague just passed the same underpass 20 minutes ago and says cars were moving slowly, though water was pooling near the culvert and wind is picking up heavily. Is the road actually shut down or can I drive home before dark?",
+    language: "en-IN",
+    context: "community_safety",
+    hasImage: false,
+    imageInfo: null,
+    plan: {
+      title: "Severe Weather Travel Advisory & Underpass Road Closure Verification",
+      intent: {
+        said: "Inquiring whether the Sector 14-18 arterial underpass is officially closed due to flooding and a fallen tree, weighing a viral WhatsApp alert against an eyewitness report.",
+        trueIntent: "Route safety verification, identifying confirmed vs unconfirmed road hazards, and establishing safe contingency travel protocols during worsening weather."
+      },
+      urgency: "High",
+      confidenceScore: 0.94,
+      domain: "DISASTER",
+      summary: "Conflicting reports exist regarding the Sector 14-18 arterial underpass. A viral forward claims complete 4-foot inundation and official closure, while a recent eyewitness observed slow-moving traffic with localized pooling and gusty winds. The situation is dynamically deteriorating; official traffic police verification is required prior to transit.",
+      facts: [
+        "User received a viral WhatsApp forward at 4:30 PM asserting a red alert, 4-foot water level, fallen tree, and road closure.",
+        "An eyewitness colleague drove through the underpass ~20 minutes prior and observed slow-moving traffic with culvert pooling.",
+        "Weather conditions are actively deteriorating with intensifying wind speeds.",
+        "User is evaluating whether to attempt commuting home via the underpass before nightfall."
+      ],
+      unknowns: [
+        "Whether municipal traffic police or PWD have issued a formal, gazetted road closure order.",
+        "Current water level rate of rise at the culvert over the last 20 minutes.",
+        "Presence of downed live electrical wires from the reportedly crushed streetlight.",
+        "Roadway and drainage conditions along the alternative unpaved village bypass."
+      ],
+      conflicts: [
+        "WhatsApp forward claims the road is officially closed until morning, whereas direct eyewitness confirmed vehicle transit 20 minutes ago."
+      ],
+      extractedEntities: {
+        primaryIssue: "Severe Weather Underpass Inundation & Rumored Road Closure",
+        symptoms: [
+          "Localized water pooling near culvert",
+          "Accelerating wind gusts",
+          "Reported fallen tree obstructing roadway"
+        ],
+        history: [
+          "Arterial underpass susceptible to rapid monsoon waterlogging during intense precipitation"
+        ],
+        risks: [
+          "Hydrostatic vehicle stall in blind underpass depression",
+          "Crushed streetlight potentially carrying energization risk",
+          "Narrow village bypass becoming unnavigable in low-light rain conditions"
+        ],
+        locationContext: "Sector 14-18 arterial underpass corridor and adjacent village bypass route"
+      },
+      verification: [
+        {
+          claim: "Arterial underpass is officially closed by municipal authority.",
+          status: "Unverified",
+          evidenceUrl: "https://traffic.delhipolice.gov.in",
+          evidenceExplanation: "No official municipal closure notice has been posted on the regional traffic authority advisory portal as of last check.",
+          evidence: [
+            {
+              source: "Metropolitan Traffic Police Public Advisory Feed",
+              url: "https://traffic.delhipolice.gov.in",
+              snippet: "Real-time traffic diversions are broadcasted via official handle @dtptraffic; unverified messaging forwards often misrepresent spot congestion as statutory closures.",
+              retrievedAt: "2026-10-23T04:30:00Z"
+            }
+          ],
+          explanation: "The viral claim of official closure is unverified and contradicts recent eyewitness observation. Official traffic handles must be checked directly."
+        },
+        {
+          claim: "Underpass depressions experience rapid flash waterlogging during high-wind rainfall.",
+          status: "Verified",
+          evidenceUrl: "https://ndma.gov.in",
+          evidenceExplanation: "National Disaster Management Authority urban flood guidelines document rapid depth increases in railway/highway underpasses.",
+          evidence: [
+            {
+              source: "National Disaster Management Authority (NDMA) Urban Flood Safety Guidelines",
+              url: "https://ndma.gov.in",
+              snippet: "Motorists are cautioned that submerged underpasses conceal deep potholes and rising water; never drive through moving water of unknown depth.",
+              retrievedAt: "2026-10-23T04:30:00Z"
+            }
+          ],
+          explanation: "Regardless of closure status, underpasses pose severe hydrostatic lock and submersion perils during active pooling."
+        }
+      ],
+      actions: [
+        {
+          step: "Check Official Traffic Police Advisory (@dtptraffic or Local Traffic Helpline) Before Commencing Travel",
+          why: "Distinguishes actual civil blockades from viral social media rumors without relying on stale reports.",
+          timing: "Immediate (< 5 minutes)",
+          priority: "High",
+          requiresHumanApproval: true
+        },
+        {
+          step: "Avoid Entering Underpass if Standing Water Reaches Mid-Wheel Level",
+          why: "Entering standing water of 6+ inches can cause catalytic stall and rapid interior flooding in low-clearance passenger cars.",
+          timing: "During commute",
+          priority: "Critical",
+          requiresHumanApproval: true
+        },
+        {
+          step: "Identify Well-Lit Elevated Alternative Arterials Over Unpaved Rural Bypasses",
+          why: "Unpaved village roads carry severe mud-trap hazards and lack emergency towing during storm conditions.",
+          timing: "Before departure",
+          priority: "Normal",
+          requiresHumanApproval: true
+        }
+      ],
+      humanGuidance: [
+        "DO NOT RUSH INTO THE UNDERPASS: If water is visibly pooling past the curb or you cannot see the road markings, TURN AROUND immediately.",
+        "CHECK OFFICIAL CHANNELS: Verify traffic status via the official police Twitter/X feed or traffic hotline rather than forwarding unverified WhatsApp alerts.",
+        "STAY OFF UNLIGHTED BYPASSES: If traveling before dark, prefer major multi-lane elevated corridors even if slightly slower than village cut-throughs."
+      ],
+      draftPayloads: [
+        {
+          targetSystem: "CIVIC_TRAFFIC_EOC",
+          actionCode: "CIVIC_INCIDENT_REPORT",
+          priority: "P2",
+          payloadSummary: "Verify water level & tree obstruction at Sector 14-18 Underpass. Spot culvert pooling reported.",
+          sent: false
+        },
+        {
+          targetSystem: "METROPOLITAN_PWD_HELPDESK",
+          actionCode: "DRAINAGE_INSPECTION_REQUEST",
+          priority: "P2",
+          payloadSummary: "Inspect culvert drainage pumps and streetlight integrity at Sector 14-18 arterial approach.",
+          sent: false
+        }
+      ],
+      rawSystemPayload: {
+        header: {
+          specVersion: "SAARTHI-EOC-v1.0",
+          incidentId: "INC-CIV-2026-3021",
+          timestampUtc: "2026-10-23T04:30:00Z",
+          classification: "DRAFT_SIMULATION_ONLY",
+          regulatoryNotice: "DRAFT PAYLOAD — NOT SENT TO ANY REAL SYSTEM"
+        },
+        context: "COMMUNITY_SAFETY_WEATHER",
+        hazardTriage: {
+          rumorValidation: "CONFLICTING_EYEWITNESS_VS_FORWARD",
+          weatherCondition: "ACCELERATING_GUSTS_RAINFALL",
+          recommendedStatus: "ROUTE_CAUTION_CHECK_OFFICIAL"
+        }
+      },
+      safety_note: "PUBLIC SAFETY ADVISORY: This tool provides information organization and does not replace live meteorological or traffic authority directives. If stranded in rising water, exit vehicle to higher ground immediately.",
+      safetyNotes: [
+        "PUBLIC SAFETY ADVISORY: This tool provides information organization and does not replace live meteorological or traffic authority directives.",
+        "Never drive through standing floodwater of unknown depth.",
+        "Treat all downed utility poles and streetlights as energized until certified isolated by the electric utility."
+      ],
+      follow_up_question: "Are you currently in a safe indoor shelter, and what vehicle type (two-wheeler, hatchback, SUV) are you intending to drive?",
+      followUpQuestions: [
+        "Are you currently in a safe indoor shelter or already in transit?",
+        "What vehicle type (two-wheeler, hatchback, SUV) are you intending to drive?"
+      ]
+    }
+  },
+
+  // ---------------------------------------------------------------------------
+  // SCENARIO B: Health Information Organization (Symptoms & Meds Notes)
+  // ---------------------------------------------------------------------------
+  health_organization: {
+    id: "preset_health_organization",
+    name: "B. Health Information Organization",
+    category: "CIVIC",
+    subtitle: "Messy symptoms note • Metformin + Amlodipine + new Ibuprofen • Clinician questions",
+    inputText: "My father (62) has been feeling unusually fatigued for the past 2 weeks, with mild swelling in both ankles by evening. He has had Type 2 diabetes for 8 years (takes Metformin 500mg twice daily) and mild hypertension (Amlodipine 5mg morning). Yesterday he started an OTC painkiller (Ibuprofen 400mg) for lower back pain, and today he noticed decreased urination and slight nausea. Can he continue the Ibuprofen, and what should we ask his doctor when we visit tomorrow?",
+    language: "en-IN",
+    context: "health_notes",
+    hasImage: false,
+    imageInfo: null,
+    plan: {
+      title: "Clinical Consultation Preparation: Symptom Timeline & NSAID-Renal Risk Organization",
+      intent: {
+        said: "Father (62) with diabetes and hypertension on Metformin/Amlodipine developed fatigue, ankle swelling, and acute oliguria/nausea after taking OTC Ibuprofen for back pain; inquiring about drug safety and doctor consultation questions.",
+        trueIntent: "Organizing patient clinical timeline, flagging high-risk OTC NSAID interaction with underlying diabetic renal function, and preparing targeted questions for the treating physician."
+      },
+      urgency: "High",
+      confidenceScore: 0.95,
+      domain: "MEDICAL",
+      summary: "Patient details organized for physician consultation. 62-year-old male with chronic diabetes and hypertension presenting with progressive fatigue and ankle edema, followed by acute decreased urination (oliguria) and nausea after starting OTC Ibuprofen. In patients with diabetes and hypertension, NSAIDs carry significant risk of acute kidney injury (AKI) and blunting of antihypertensive effect. Immediate withholding of OTC NSAID pending clinical evaluation is strongly recommended.",
+      facts: [
+        "Patient is a 62-year-old male.",
+        "Chronic conditions: Type 2 Diabetes Mellitus (8 years) and Hypertension.",
+        "Current maintenance medications: Metformin 500mg twice daily; Amlodipine 5mg once daily.",
+        "Symptoms: Progressive fatigue (2 weeks), bilateral ankle swelling (evenings), acute decreased urination (today), and nausea (today).",
+        "Recent change: Initiated over-the-counter Ibuprofen 400mg yesterday for lower back pain."
+      ],
+      unknowns: [
+        "Most recent baseline renal function panel (Serum Creatinine, eGFR, Blood Urea Nitrogen).",
+        "Most recent HbA1c and home blood glucose readings.",
+        "Current resting blood pressure measurement.",
+        "Exact 24-hour fluid intake and presence of fever or urinary burning/dysuria."
+      ],
+      conflicts: [
+        "Patient is considering continuing an OTC NSAID (Ibuprofen) for pain relief, but new-onset oliguria and nausea suggest potential acute renal stress requiring medical review."
+      ],
+      extractedEntities: {
+        primaryIssue: "Symptom & Medication History Organization for Physician Evaluation",
+        symptoms: [
+          "Generalized fatigue (2 weeks duration)",
+          "Bilateral peripheral ankle edema (evening onset)",
+          "Acute oliguria (decreased urine output)",
+          "Mild nausea",
+          "Lower back pain (trigger for analgesic)"
+        ],
+        history: [
+          "Type 2 Diabetes Mellitus (8 years duration)",
+          "Essential Hypertension"
+        ],
+        risks: [
+          "NSAID-induced Acute Kidney Injury (AKI) in diabetic patient",
+          "Metformin accumulation risk if renal clearance is impaired",
+          "Worsening fluid retention / edema"
+        ],
+        locationContext: "Home outpatient setting; scheduled for in-person physician appointment tomorrow"
+      },
+      verification: [
+        {
+          claim: "NSAIDs (Ibuprofen) can impair renal hemodynamics in diabetic and hypertensive patients.",
+          status: "Verified",
+          evidenceUrl: "https://www.kidney.org",
+          evidenceExplanation: "National Kidney Foundation and clinical pharmacology guidelines document that NSAIDs inhibit prostaglandins, reducing renal blood flow and eGFR in chronic kidney disease or diabetes.",
+          evidence: [
+            {
+              source: "National Kidney Foundation (NKF) Clinical Care Protocols",
+              url: "https://www.kidney.org",
+              snippet: "Patients with diabetes and hypertension should avoid routine NSAID usage without nephrologist approval due to heightened risk of acute interstitial nephritis and renal hypoperfusion.",
+              retrievedAt: "2026-10-23T04:30:00Z"
+            }
+          ],
+          explanation: "Established pharmacologic risk. Co-administration of Metformin during acute renal decrement also requires medical oversight."
+        },
+        {
+          claim: "SAARTHI AI can provide clinical diagnosis or adjust prescription dosages.",
+          status: "Contradicted",
+          evidenceUrl: "https://www.mohfw.gov.in",
+          evidenceExplanation: "Telemedicine Practice Guidelines and statutory health standards require registered medical practitioners to conduct diagnosis and dosing.",
+          evidence: [
+            {
+              source: "Ministry of Health & Family Welfare Telemedicine Practice Guidelines",
+              url: "https://www.mohfw.gov.in",
+              snippet: "Algorithmic and decision-support systems must not replace registered clinical diagnosis, laboratory testing, or physician prescribing authority.",
+              retrievedAt: "2026-10-23T04:30:00Z"
+            }
+          ],
+          explanation: "This system organizes notes and questions but strictly avoids diagnosing or prescribing."
+        }
+      ],
+      actions: [
+        {
+          step: "Withhold Further Doses of OTC Ibuprofen Pending Tomorrow's Doctor Visit",
+          why: "Halts further prostaglandin inhibition and mitigates acute renal perfusion stress until kidney function is checked.",
+          timing: "Immediate",
+          priority: "Critical",
+          requiresHumanApproval: true
+        },
+        {
+          step: "Log 24-Hour Urine Output and Fluid Intake in a Written Notebook",
+          why: "Provides objective intake/output volumetric data to the consulting physician to assess true oliguria.",
+          timing: "Today until appointment",
+          priority: "High",
+          requiresHumanApproval: true
+        },
+        {
+          step: "Present Structured Clinical Questions to the Physician Tomorrow",
+          why: "Ensures essential diagnostic tests (Serum Creatinine, eGFR, Urinalysis) are requested during consultation.",
+          timing: "During consultation tomorrow",
+          priority: "High",
+          requiresHumanApproval: true
+        }
+      ],
+      humanGuidance: [
+        "BRING ALL MEDICATION PACKAGES: Take his Metformin, Amlodipine, and the exact Ibuprofen strip to the clinic so the doctor sees exact strengths.",
+        "WRITE DOWN THIS SPECIFIC QUESTION LIST: Ask the doctor: 'Given his new decreased urination and diabetes, should we check his Serum Creatinine and eGFR today, and is an alternative for his back pain safer than Ibuprofen?'",
+        "RED FLAG WARNING: If he develops severe vomiting, shortness of breath, confusion, or complete inability to pass urine, go to the Emergency Room tonight without waiting for tomorrow."
+      ],
+      draftPayloads: [
+        {
+          targetSystem: "CLINICAL_SUMMARY_EXPORT",
+          actionCode: "PATIENT_BRIEF_GENERATION",
+          priority: "P2",
+          payloadSummary: "Patient Brief: 62M, T2DM, HTN, Metformin+Amlodipine. Acute oliguria + nausea post-Ibuprofen. Clinician consultation prep.",
+          sent: false
+        }
+      ],
+      rawSystemPayload: {
+        header: {
+          specVersion: "SAARTHI-EOC-v1.0",
+          incidentId: "INC-MED-2026-7782",
+          timestampUtc: "2026-10-23T04:30:00Z",
+          classification: "DRAFT_SIMULATION_ONLY",
+          regulatoryNotice: "DRAFT PAYLOAD — NOT SENT TO ANY REAL SYSTEM"
+        },
+        context: "HEALTH_INFORMATION_ORGANIZATION",
+        clinicalTriage: {
+          patientAge: 62,
+          comorbidities: ["TYPE_2_DIABETES", "HYPERTENSION"],
+          offendingDrugTrigger: "IBUPROFEN_OTC",
+          reportedSymptomOnset: "ACUTE_OLIGURIA_NAUSEA",
+          advisoryAction: "WITHHOLD_NSAID_PHYSICIAN_EVAL_RECOMMENDED"
+        }
+      },
+      safety_note: "CLINICAL INFORMATION DISCLAIMER: SAARTHI AI is an information-structuring tool. It does NOT diagnose conditions, prescribe medications, or replace a clinical consultation. If red flag symptoms appear, seek emergency medical care immediately.",
+      safetyNotes: [
+        "CLINICAL INFORMATION DISCLAIMER: SAARTHI AI is an information-structuring tool, not a physician.",
+        "Do not discontinue prescribed chronic medications (Metformin, Amlodipine) without explicit physician instructions.",
+        "Seek emergency hospital care if chest tightness, labored breathing, or severe intractable vomiting occurs."
+      ],
+      follow_up_question: "Has he passed any urine in the last 6 to 8 hours, and does he have any swelling in his face or around his eyes?",
+      followUpQuestions: [
+        "Has he passed any urine in the last 6 to 8 hours?",
+        "Does he have any puffiness or swelling around his eyes or hands?"
+      ]
+    }
+  },
+
+  // ---------------------------------------------------------------------------
+  // SCENARIO C: Public-Service Navigation (Benefits & Application Aid)
+  // ---------------------------------------------------------------------------
+  public_service: {
+    id: "preset_public_service",
+    name: "C. Public-Service Navigation",
+    category: "CIVIC",
+    subtitle: "Senior pension & disability benefits • Fee exploitation check • Official portal guide",
+    inputText: "I'm trying to apply for the senior citizen pension scheme and disability assistance for my uncle (67yo, partial visual impairment). The cyber cafe guy asked for ₹2,500 cash and told us to submit his ration card, old voter ID, and a medical certificate from 2018, but a neighbor said the state portal requires an Aadhaar-linked bank account, income certificate below ₹2 lakh, and a new digital UDID disability card. Is the offline form still valid, and do we have to pay this fee or can we apply directly through the government portal?",
+    language: "en-IN",
+    context: "public_service",
+    hasImage: false,
+    imageInfo: null,
+    plan: {
+      title: "Public Benefit Navigation: Senior Pension (IGNOAPS) & UDID Disability Application Guide",
+      intent: {
+        said: "Inquiring about applying for senior pension and disability benefits for a 67-year-old uncle with visual impairment, questioning a ₹2,500 intermediary cash demand and conflicting documentation requirements.",
+        trueIntent: "Clarifying legitimate government welfare eligibility, preventing unauthorized fee exploitation, and organizing mandatory digital documentation for official portal submission."
+      },
+      urgency: "Moderate",
+      confidenceScore: 0.96,
+      domain: "CIVIC",
+      summary: "Navigational guidance for National Social Assistance Programme (NSAP) senior pension and Unique Disability ID (UDID) assistance. Demands for ₹2,500 cash by private cyber cafe operators represent unauthorized intermediary exploitation: official government applications are free of service fees or carry nominal CSC fee caps (₹30–50). Submissions require an active Aadhaar-seeded bank account, current income certificate, and a digital UDID card rather than an expired 2018 paper slip.",
+      facts: [
+        "Beneficiary is a 67-year-old male with reported partial visual impairment.",
+        "Seeking both Senior Citizen Pension and Disability Assistance benefits.",
+        "Cyber cafe operator demanded ₹2,500 cash to file the application with 2018 medical certificate and ration card.",
+        "Beneficiary has existing ration card and voter ID; status of Aadhaar bank seeding and UDID card is unconfirmed."
+      ],
+      unknowns: [
+        "Specific State / Union Territory of residence (NSAP pension top-ups and income cutoffs vary by state).",
+        "Whether applicant's bank account has active NPCI Aadhaar-DBT (Direct Benefit Transfer) mapping.",
+        "Certified percentage of visual impairment (national disability assistance typically requires ≥ 40% certified disability on UDID portal).",
+        "Current annual household income verified by Tehsildar / Revenue Authority."
+      ],
+      conflicts: [
+        "Cyber cafe claims ₹2,500 cash fee and 2018 medical certificate suffice, whereas official guidelines provide free/nominal filing and mandate national UDID registration."
+      ],
+      extractedEntities: {
+        primaryIssue: "Senior Pension & Disability Welfare Scheme Navigation & Fee Protection",
+        symptoms: [],
+        history: [
+          "Possesses 2018 legacy medical certificate",
+          "Possesses ration card and voter ID"
+        ],
+        risks: [
+          "Financial exploitation via unauthorized intermediary fee (₹2,500)",
+          "Application rejection due to obsolete 2018 medical slip instead of digital UDID card",
+          "Pension disbursement failure if bank account is not Aadhaar-DBT seeded"
+        ],
+        locationContext: "State Social Welfare Department jurisdiction / CSC Common Service Center network"
+      },
+      verification: [
+        {
+          claim: "Government pension applications under NSAP carry no official ₹2,500 filing fee.",
+          status: "Verified",
+          evidenceUrl: "https://nsap.nic.in",
+          evidenceExplanation: "National Social Assistance Programme guidelines state that social welfare schemes are free public services, and Common Service Centers (CSCs) have strictly regulated nominal transaction fees.",
+          evidence: [
+            {
+              source: "Ministry of Rural Development — NSAP Portal Guidelines",
+              url: "https://nsap.nic.in",
+              snippet: "Application forms for Indira Gandhi National Old Age Pension Scheme (IGNOAPS) can be filed online free of charge or through authorized CSCs for nominal government-fixed charges.",
+              retrievedAt: "2026-10-23T04:30:00Z"
+            }
+          ],
+          explanation: "Demanding ₹2,500 for welfare form filling is fraudulent intermediary behavior. Beneficiaries can file directly on nsap.nic.in or at district social welfare offices."
+        },
+        {
+          claim: "Unique Disability ID (UDID) digital card is the mandatory national standard for disability schemes.",
+          status: "Verified",
+          evidenceUrl: "https://www.swavlambancard.gov.in",
+          evidenceExplanation: "Department of Empowerment of Persons with Disabilities mandates digital UDID cards for all central and state welfare benefits.",
+          evidence: [
+            {
+              source: "Department of Empowerment of Persons with Disabilities (DEPwD)",
+              url: "https://www.swavlambancard.gov.in",
+              snippet: "The UDID card serves as the single national document of identification and disability verification, replacing manual state hospital certificates.",
+              retrievedAt: "2026-10-23T04:30:00Z"
+            }
+          ],
+          explanation: "The 2018 manual slip must be transitioned to the UDID portal via online medical board assessment."
+        }
+      ],
+      actions: [
+        {
+          step: "DO NOT PAY the ₹2,500 Cash Demand to Private Intermediaries",
+          why: "Welfare scheme forms are free. Authorized Common Service Centers (CSC) charge only a fixed nominal fee (₹30–50).",
+          timing: "Immediate",
+          priority: "Critical",
+          requiresHumanApproval: true
+        },
+        {
+          step: "Apply for Digital UDID Card on Official Swavlamban Portal (swavlambancard.gov.in)",
+          why: "Converts legacy 2018 medical slip into the legally mandated national digital disability credential.",
+          timing: "Step 1 of application",
+          priority: "High",
+          requiresHumanApproval: true
+        },
+        {
+          step: "Verify Aadhaar-DBT Seeding at Beneficiary's Bank Branch",
+          why: "Direct Benefit Transfer pension disbursements bounce if the account lacks NPCI Aadhaar bridge linking.",
+          timing: "Step 2 of application",
+          priority: "High",
+          requiresHumanApproval: true
+        },
+        {
+          step: "Submit Online Pension Application on Official NSAP Portal (nsap.nic.in) or District Social Welfare Office",
+          why: "Ensures direct government registry enrollment without unverified third-party paper intermediaries.",
+          timing: "Step 3 of application",
+          priority: "High",
+          requiresHumanApproval: true
+        }
+      ],
+      humanGuidance: [
+        "REFUSE PRIVATE FEES: Report or decline any person charging thousands of rupees to file government pension forms. Visit a government-authorized CSC center (csc.gov.in) where charges are capped.",
+        "GATHER REQUIRED DOCUMENTS: Prepare: (1) Aadhaar Card, (2) Bank passbook copy with IFSC, (3) Recent passport photo, (4) Income certificate from local Tehsildar, (5) New UDID registration receipt.",
+        "USE OFFICIAL PORTALS ONLY: Access the national portal at https://nsap.nic.in or your respective State Social Welfare Department website."
+      ],
+      draftPayloads: [
+        {
+          targetSystem: "PUBLIC_PORTAL_ROUTING",
+          actionCode: "BENEFITS_NAVIGATOR_DIRECTIVE",
+          priority: "P2",
+          payloadSummary: "Route to NSAP IGNOAPS + Swavlamban UDID workflows. Issue fee-exploitation alert to applicant.",
+          sent: false
+        }
+      ],
+      rawSystemPayload: {
+        header: {
+          specVersion: "SAARTHI-EOC-v1.0",
+          incidentId: "INC-PUB-2026-1904",
+          timestampUtc: "2026-10-23T04:30:00Z",
+          classification: "DRAFT_SIMULATION_ONLY",
+          regulatoryNotice: "DRAFT PAYLOAD — NOT SENT TO ANY REAL SYSTEM"
+        },
+        context: "PUBLIC_SERVICE_NAVIGATION",
+        schemeEligibility: {
+          targetScheme: "IGNOAPS_AND_DISABILITY_PENSION",
+          applicantAge: 67,
+          mandatoryCredentials: ["UDID_DIGITAL_CARD", "AADHAAR_DBT_SEEDED_ACCOUNT", "INCOME_CERTIFICATE"],
+          antiFraudAlert: "UNAUTHORIZED_INTERMEDIARY_FEE_FLAGGED"
+        }
+      },
+      safety_note: "PUBLIC SERVICE NOTICE: SAARTHI AI provides procedural navigation and information. It is not an official government portal and does not submit welfare applications directly. Never share banking PINs, OTPs, or passwords.",
+      safetyNotes: [
+        "PUBLIC SERVICE NOTICE: SAARTHI AI provides navigational guidance, not official government processing.",
+        "Never share bank account passwords, UPI PINs, or Aadhaar OTPs with cyber cafe operators or third parties.",
+        "Official government welfare applications carry no hidden processing fee."
+      ],
+      follow_up_question: "Which State and District does your uncle reside in, and is his bank account already linked to his Aadhaar card?",
+      followUpQuestions: [
+        "Which State and District does your uncle reside in?",
+        "Is his bank account currently linked with his Aadhaar card for Direct Benefit Transfer (DBT)?"
+      ]
+    }
+  },
+
+  // ---------------------------------------------------------------------------
+  // SCENARIO D: Medical Crisis (Acute Coronary Syndrome / Highway Triage)
+  // ---------------------------------------------------------------------------
   medical_crisis: {
     id: "preset_medical_crisis",
-    name: "Medical Crisis (Hinglish)",
+    name: "D. Emergency Dispatch",
     category: "MEDICAL",
-    subtitle: "Panicked Hinglish report • Sudden chest pain • NH48 Toll",
+    subtitle: "Panicked Hinglish report • Sudden chest pain • NH48 Toll bottleneck",
     inputText: "Arrey suno jaldi, pitaji (68 yr) ko achanak chest me bohot tez dard ho raha hai, left arm me jaa raha hai aur behisaab pasina aa raha hai! He has diabetes since 12 years and takes Telma 40 for BP. We are stuck near Khed Shivapur toll plaza on NH48, traffic jam hai! Please tell what to do quick!",
     language: "hi-IN",
+    context: "emergency_crisis",
     hasImage: false,
     imageInfo: null,
     plan: {
@@ -65,6 +552,8 @@ const DEMO_PRESETS = {
         {
           claim: "Khed Shivapur Toll Plaza is situated on NH48 Pune-Satara highway with dedicated emergency NHAI ambulance patrol.",
           status: "Verified",
+          evidenceUrl: "https://morth.nic.in",
+          evidenceExplanation: "NHAI Expressways and National Highways maintain 24/7 dedicated patrolling and 1033 helpline with nearest ambulance stationing.",
           evidence: [
             {
               source: "NHAI Highway Operations Directory / Regional Transport Registry",
@@ -78,6 +567,8 @@ const DEMO_PRESETS = {
         {
           claim: "Substernal chest pain radiating to left arm with diaphoresis in a diabetic male indicates acute coronary syndrome.",
           status: "Verified",
+          evidenceUrl: "https://www.mohfw.gov.in",
+          evidenceExplanation: "Diabetic patients experiencing chest pain with autonomic signs require emergent 12-lead ECG and immediate PCI capable center transport.",
           evidence: [
             {
               source: "Standard Indian & International Clinical Emergency Practice Guidelines",
@@ -87,19 +578,6 @@ const DEMO_PRESETS = {
             }
           ],
           explanation: "High clinical sensitivity for myocardial infarction; immediate non-pharmacologic stabilizing measures must occur while dispatch runs."
-        },
-        {
-          claim: "Immediate self-administration of high dose prescription vasodilators without physician consultation.",
-          status: "Contradicted",
-          evidence: [
-            {
-              source: "Emergency Care Pharmacology Safety Protocol",
-              url: "https://cdsco.gov.in",
-              snippet: "Do not administer unprescribed cardiac medications or antiplatelets if patient blood pressure or allergies are unconfirmed in field.",
-              retrievedAt: "2026-10-23T04:10:00Z"
-            }
-          ],
-          explanation: "Telmisartan is an ARB for BP; unmonitored nitroglycerin could cause catastrophic hypotension if inferior wall MI is present."
         }
       ],
       actions: [
@@ -171,358 +649,19 @@ const DEMO_PRESETS = {
           reportedCorridor: "NH48_PUNE_SATARA",
           landmark: "KHED_SHIVAPUR_TOLL_PLAZA",
           trafficStatus: "GRIDLOCK_DETECTED"
-        },
-        routing: {
-          primaryResponder: "EMS_ALS_108_112",
-          auxiliarySupport: "NHAI_PATROL_1033",
-          secondaryAgency: "HIGHWAY_TRAFFIC_POLICE"
         }
       },
       safety_note: "CRITICAL SAFETY OVERRIDE: This application is an automated decision-support engine, not a licensed medical professional or physician. In life-threatening emergencies, dial 112 immediately.",
-      follow_up_question: "Are you parked on the northbound (towards Pune) or southbound lane, and what is your vehicle color/registration number for dispatch identification?"
-    }
-  },
-
-  community_safety: {
-    id: "preset_community_safety",
-    name: "Community Safety & Disaster",
-    category: "DISASTER",
-    subtitle: "Flooded underpass • Stalled school bus (18 kids) • Snapped live wire",
-    inputText: "Emergency at Minto Bridge underpass! Water level has reached 5 feet rapidly due to cloudburst. A yellow school bus with 18 kids is half submerged and stalled. High-tension wire just snapped from the pole above and is hanging close to the water! WhatsApp group is claiming road is officially blocked but cars are still entering from the CP side!",
-    language: "en-IN",
-    hasImage: false,
-    imageInfo: null,
-    plan: {
-      title: "Flash Flood, Snapped High-Tension Electrical Wire & Trapped School Bus Emergency Cordon",
-      intent: {
-        said: "School bus carrying 18 children stalled in 5-foot water at Minto Bridge underpass with live electrical wire hanging overhead and unauthorized traffic still entering.",
-        trueIntent: "Emergency grid power de-energization, multi-victim aquatic rescue dispatch, and physical police traffic blockade at all entry approaches."
-      },
-      urgency: "Immediate",
-      confidenceScore: 0.98,
-      domain: "DISASTER",
-      summary: "Catastrophic dual-threat incident involving rapid flash flooding, 18 trapped school children in a submerged bus, and active electrocution peril from a snapped overhead high-tension line at Minto Bridge underpass. Demands instantaneous power station trip before waterborne rescue ingress.",
-      facts: [
-        "Location is the Minto Bridge underpass (connecting Connaught Place / New Delhi Railway Station area).",
-        "Water depth is approximately 5 feet and rising following intense precipitation.",
-        "School bus is stalled and partially submerged with approximately 18 children inside.",
-        "High-tension electrical wire is snapped and hanging in close proximity to the standing water.",
-        "Vehicle ingress remains active from the Connaught Place (CP) side despite online claims of closure."
+      safetyNotes: [
+        "CRITICAL SAFETY OVERRIDE: This application is an automated decision-support engine, not a licensed medical professional or physician.",
+        "In life-threatening emergencies, dial 112 or 108 immediately.",
+        "Do not leave the patient unattended in a stalled vehicle."
       ],
-      unknowns: [
-        "Whether electrical wire is physically touching or arcing into the water pool.",
-        "Exact school name and bus registration number to contact school administration and parents.",
-        "Internal water height inside the bus passenger compartment.",
-        "Presence of adult attendants or driver status inside the bus."
-      ],
-      conflicts: [
-        "Social media / messaging groups report road closure, but physical on-ground vehicles are still actively driving into the hazard zone."
-      ],
-      extractedEntities: {
-        primaryIssue: "Submerged School Bus with Live Overhead Electrical Hazard",
-        symptoms: [
-          "5-foot flash flood submersion",
-          "Vehicle engine stall / hydrostatic lock",
-          "Mass civilian entrapment (minors)",
-          "Overhead power line rupture"
-        ],
-        history: [
-          "Minto Bridge underpass is an established severe monsoon waterlogging vulnerability hotspot"
-        ],
-        risks: [
-          "Mass electrocution via water conductivity",
-          "Drowning / hypothermia of minor occupants",
-          "Secondary multi-vehicle pileup in blind underpass entrance"
-        ],
-        locationContext: "Minto Bridge Underpass, New Delhi (CP Outer Circle to DDU Marg arterial route)"
-      },
-      verification: [
-        {
-          claim: "Minto Bridge is an officially documented high-risk flood depression under Delhi Municipal and Traffic Police monitoring.",
-          status: "Verified",
-          evidence: [
-            {
-              source: "Delhi Disaster Management Authority (DDMA) & PWD Flood Control Registry",
-              url: "https://ddma.delhigovt.nic.in",
-              snippet: "Minto Road railway underpass has automated flood pumps and CCTV sensors designated for immediate monsoon traffic diversions.",
-              retrievedAt: "2026-10-23T04:10:00Z"
-            }
-          ],
-          explanation: "Historical data and municipal documentation corroborate recurring flash inundation vulnerability at this specific coordinate."
-        },
-        {
-          claim: "High-tension wire rupture creates lethal electrical potential gradient in conductive rainwater pools.",
-          status: "Verified",
-          evidence: [
-            {
-              source: "Central Electricity Authority (CEA) Safety Regulations",
-              url: "https://cea.nic.in",
-              snippet: "Severed conductors in standing water require feeder line lock-out tag-out (LOTO) de-energization prior to emergency personnel approach.",
-              retrievedAt: "2026-10-23T04:10:00Z"
-            }
-          ],
-          explanation: "Rescue personnel cannot safely deploy boats or enter water until electricity distribution company confirms circuit breaker trip."
-        },
-        {
-          claim: "Road is officially sealed by automated barrier gates.",
-          status: "Contradicted",
-          evidence: [
-            {
-              source: "Caller Field Observation Report",
-              url: "field://caller-observation",
-              snippet: "Physical motor vehicles are observed continuing entry from Connaught Place approach ramp.",
-              retrievedAt: "2026-10-23T04:10:00Z"
-            }
-          ],
-          explanation: "Claims that the street is blocked are contradicted by ongoing traffic inflow; manual physical barrier team must be dispatched."
-        }
-      ],
-      actions: [
-        {
-          step: "Emergency Substation Trip: BSES / DISCOM Feeder De-energization",
-          why: "Eliminates lethal electrocution risk for trapped children and incoming rescue divers.",
-          timing: "Immediate (< 60 seconds)",
-          priority: "Critical",
-          requiresHumanApproval: true
-        },
-        {
-          step: "Dispatch Delhi Fire Services & NDRF Aquatic Rescue Unit",
-          why: "Inflatable rescue rafts and high-clearance rescue vehicles required to safely evacuate 18 children from submerged vehicle.",
-          timing: "Immediate (< 2 minutes)",
-          priority: "Critical",
-          requiresHumanApproval: true
-        },
-        {
-          step: "Deploy Traffic Police Physical Barricade at CP & DDU Marg Approaches",
-          why: "Stop incoming civilian cars from entering deep water pool and aggravating the hazard.",
-          timing: "Within 3 minutes",
-          priority: "Critical",
-          requiresHumanApproval: true
-        }
-      ],
-      humanGuidance: [
-        "STAY AWAY FROM WATER: Warn all bystanders on the sidewalk to stay at least 30 meters back from the water edge due to live electrical wire hazard.",
-        "SHOUT CLEAR INSTRUCTIONS TO BUS: Tell the driver and children through megaphone or loud voice to REMAIN INSIDE THE BUS on seats. Do NOT let children jump into the water.",
-        "STOP INCOMING VEHICLES: From a dry, safe position on the CP ramp, signal incoming cars with flashlights or hand waving to halt before descending."
-      ],
-      draftPayloads: [
-        {
-          targetSystem: "POWER_DISCOM_GRID_CONTROL",
-          actionCode: "POWER_GRID_ISOLATE",
-          priority: "P1",
-          payloadSummary: "IMMEDIATE FEEDER TRIP: Minto Bridge Substation, Feeder 11kV/33kV Line Cordon. Active wire collapse into floodwater.",
-          sent: false
-        },
-        {
-          targetSystem: "DISASTER_MGMT_EOC",
-          actionCode: "DISASTER_NDRF_DISPATCH",
-          priority: "P1",
-          payloadSummary: "Code Red: Flash flood entrapment, 18 school children in submerged bus at Minto Bridge underpass. Rubber boats + ALS backup requested.",
-          sent: false
-        },
-        {
-          targetSystem: "METROPOLITAN_TRAFFIC_POLICE",
-          actionCode: "TRAFFIC_POLICE_CORDON",
-          priority: "P1",
-          payloadSummary: "Emergency total closure: Seal Minto Bridge approaches from Outer Circle Connaught Place and Deen Dayal Upadhyaya Marg.",
-          sent: false
-        }
-      ],
-      rawSystemPayload: {
-        header: {
-          specVersion: "SAARTHI-EOC-v1.0",
-          incidentId: "INC-DIS-2026-4412",
-          timestampUtc: "2026-10-23T04:10:00Z",
-          classification: "DRAFT_SIMULATION_ONLY",
-          regulatoryNotice: "DRAFT PAYLOAD — NOT SENT TO ANY REAL SYSTEM"
-        },
-        incidentClassification: "CIVIL_MASS_PERIL_FLOOD_ELECTRICAL",
-        hazardMatrix: {
-          waterDepthFeet: 5.0,
-          structuralEnclosure: "RAILWAY_UNDERPASS",
-          electricalHazard: "ACTIVE_LIVE_HT_WIRE",
-          occupantVulnerability: "PEDIATRIC_MINORS_18"
-        },
-        actionDirectives: [
-          { agency: "DISCOM_GRID", command: "TRIP_SUBSTATION_BREAKER_EMERGENCY" },
-          { agency: "FIRE_DISASTER_SERVICE", command: "INFLATABLE_BOAT_EXTRACTION" },
-          { agency: "TRAFFIC_POLICE", command: "PHYSICAL_BARRIER_DEPLOYMENT" }
-        ]
-      },
-      safety_note: "CRITICAL DANGER: Never step into water in the vicinity of fallen cables. Pure water conductivity and ground potential gradient can be fatal up to tens of meters away. Do not attempt rescue until grid isolation is verified.",
-      follow_up_question: "Are the bus tires completely submerged, and is water visibly rising inside the cabin floorboards?"
-    }
-  },
-
-  health_prescription_navigator: {
-    id: "preset_health_navigator",
-    name: "Health & Prescription Navigator",
-    category: "CIVIC",
-    subtitle: "Elderly patient (74) • Warfarin + Ciprofloxacin conflict • Hives & facial swelling",
-    inputText: "My 74yo grandmother was prescribed Ciprofloxacin 500mg yesterday for UTI by a local clinic. She also takes Warfarin 3mg daily for atrial fibrillation. She took the first dose this morning, and now has widespread itchy hives, facial swelling, and says she's dizzy. She had a penicillin reaction 10 years ago. Can she take another dose with Avil or Cetirizine?",
-    language: "en-IN",
-    hasImage: false,
-    imageInfo: null,
-    plan: {
-      title: "Acute Allergic Reaction (Angioedema Risk) & Severe Warfarin-Fluoroquinolone Interaction Triage",
-      intent: {
-        said: "74-year-old female on Warfarin experiencing acute hives, facial swelling, and dizziness after starting Ciprofloxacin for UTI, asking if she can take another dose alongside an antihistamine.",
-        trueIntent: "Emergency clinical safety halt: Prevent lethal repeat antibiotic dose, evaluate emergent angioedema airway risk, and alert treating physician to severe anticoagulant drug interaction."
-      },
-      urgency: "Immediate",
-      confidenceScore: 0.95,
-      domain: "MEDICAL",
-      summary: "Patient is exhibiting signs of an acute hypersensitivity reaction (urticaria, facial angioedema, dizziness) following initiation of Ciprofloxacin. Concurrently, co-administration of Ciprofloxacin with Warfarin is a major Category X/D drug interaction that dangerously inhibits CYP1A2/CYP2C9, precipitating severe supratherapeutic INR and catastrophic hemorrhage risk. Repeat dosing must be strictly withheld and immediate emergency evaluation conducted.",
-      facts: [
-        "Patient is a 74-year-old female taking maintenance Warfarin 3mg daily for atrial fibrillation.",
-        "Prescribed Ciprofloxacin 500mg yesterday for urinary tract infection (UTI).",
-        "Developed widespread pruritic hives, facial swelling, and dizziness following the first dose.",
-        "Remote historical allergic reaction to Penicillin 10 years ago.",
-        "Family is considering administering an over-the-counter antihistamine (Avil / Cetirizine) and continuing Ciprofloxacin."
-      ],
-      unknowns: [
-        "Presence of hoarseness, throat tightness, stridor, or difficulty swallowing/breathing.",
-        "Current blood pressure and pulse rate (dizziness may indicate anaphylactic hypotension or severe arrhythmia).",
-        "Most recent baseline International Normalized Ratio (INR) level.",
-        "Prescribing physician contact info or local emergency department proximity."
-      ],
-      conflicts: [
-        "Family is questioning whether to administer another Ciprofloxacin dose with an antihistamine, whereas continuing the offending antibiotic could trigger fatal anaphylactic shock."
-      ],
-      extractedEntities: {
-        primaryIssue: "Drug-Induced Angioedema & Major Anticoagulant Interaction",
-        symptoms: [
-          "Widespread urticarial hives",
-          "Facial edema / swelling",
-          "Dizziness / lightheadedness",
-          "Acute onset post-ingestion"
-        ],
-        history: [
-          "Atrial fibrillation managed on Warfarin 3mg",
-          "Urinary tract infection (UTI)",
-          "Penicillin allergy (10 years ago)"
-        ],
-        risks: [
-          "Laryngeal angioedema and fatal airway obstruction",
-          "Anaphylactic shock / vascular collapse",
-          "Supratherapeutic INR elevation leading to spontaneous internal / intracranial hemorrhage"
-        ],
-        locationContext: "Home residential setting; requires transport to emergency or urgent outpatient clinic"
-      },
-      verification: [
-        {
-          claim: "Ciprofloxacin potently inhibits Warfarin metabolism, drastically increasing bleeding risk.",
-          status: "Verified",
-          evidence: [
-            {
-              source: "Pharmacology Compendium & CDSCO Drug Safety Monographs",
-              url: "https://cdsco.gov.in",
-              snippet: "Fluoroquinolones (Ciprofloxacin) inhibit hepatic CYP enzymes and alter intestinal vitamin K flora, potentiating Warfarin anticoagulant effects.",
-              retrievedAt: "2026-10-23T04:10:00Z"
-            }
-          ],
-          explanation: "Established major drug-drug interaction requiring immediate medical substitution and urgent INR surveillance."
-        },
-        {
-          claim: "Facial swelling and hives after starting a new antibiotic signify systemic type I hypersensitivity.",
-          status: "Verified",
-          evidence: [
-            {
-              source: "World Allergy Organization (WAO) Anaphylaxis Guidelines",
-              url: "https://www.worldallergy.org",
-              snippet: "Acute mucocutaneous symptoms combined with systemic signs (dizziness/hypotension) constitute clinical criteria for impending anaphylaxis.",
-              retrievedAt: "2026-10-23T04:10:00Z"
-            }
-          ],
-          explanation: "Under no circumstances should the patient be administered a second dose; antihistamines will not prevent airway closure."
-        },
-        {
-          claim: "Administering Cetirizine or Avil allows the patient to continue Ciprofloxacin safely.",
-          status: "Contradicted",
-          evidence: [
-            {
-              source: "Standard Clinical Toxicology & Allergy Protocol",
-              url: "https://mohfw.gov.in",
-              snippet: "Antihistamines mask cutaneous warning signs while serious internal anaphylactic cascades continue to progress.",
-              retrievedAt: "2026-10-23T04:10:00Z"
-            }
-          ],
-          explanation: "Treating hives with antihistamines while continuing the causal drug carries lethal risk of full-blown anaphylaxis."
-        }
-      ],
-      actions: [
-        {
-          step: "STOP Ciprofloxacin Immediately — Do Not Administer Next Dose",
-          why: "Re-exposure to an allergen causing facial edema and dizziness can cause rapid airway compromise and fatal shock.",
-          timing: "Immediate",
-          priority: "Critical",
-          requiresHumanApproval: true
-        },
-        {
-          step: "Emergency Clinical Assessment for Impending Anaphylaxis (Airway & BP)",
-          why: "Facial swelling accompanied by dizziness indicates potential vascular dilation or laryngeal involvement requiring IM epinephrine.",
-          timing: "Immediate (< 5 minutes)",
-          priority: "Critical",
-          requiresHumanApproval: true
-        },
-        {
-          step: "Urgent Treating Physician / Cardiologist Escalation for Warfarin & Antibiotic Re-prescription",
-          why: "Urgent alternative non-interacting antimicrobial for UTI required; urgent INR test needed to adjust Warfarin dose.",
-          timing: "Within 2 hours",
-          priority: "High",
-          requiresHumanApproval: true
-        }
-      ],
-      humanGuidance: [
-        "DO NOT GIVE ANOTHER DOSE OF CIPROFLOXACIN. Withhold it immediately.",
-        "Check her breathing right now: Is her voice raspy or hoarse? Is she struggling to breathe or swallow? If YES, call 112 immediately or proceed to the nearest Emergency Room without waiting.",
-        "Keep her sitting or lying comfortably with feet elevated if dizzy. Keep all medication boxes with you when consulting the doctor."
-      ],
-      draftPayloads: [
-        {
-          targetSystem: "CLINICAL_SAFETY_ADVISORY",
-          actionCode: "MED_SAFETY_HOLD_ALERT",
-          priority: "P1",
-          payloadSummary: "IMMEDIATE MEDICATION HOLD: Ciprofloxacin 500mg. Adverse reaction: Facial angioedema + urticaria + dizziness.",
-          sent: false
-        },
-        {
-          targetSystem: "PHARMACY_INTERACTION_AUDIT",
-          actionCode: "PHARMACY_ALERT_INTERACTION",
-          priority: "P1",
-          payloadSummary: "Critical drug interaction alert: Warfarin + Ciprofloxacin. Severe risk of supratherapeutic anticoagulation and hemorrhage.",
-          sent: false
-        },
-        {
-          targetSystem: "URGENT_CARE_REFERRAL",
-          actionCode: "CLINICAL_URGENT_TRIAGE",
-          priority: "P2",
-          payloadSummary: "74F presenting with possible anaphylaxis precursor. Airway monitoring, vitals, alternative UTI antibiotic selection required.",
-          sent: false
-        }
-      ],
-      rawSystemPayload: {
-        header: {
-          specVersion: "SAARTHI-EOC-v1.0",
-          incidentId: "INC-MED-2026-1049",
-          timestampUtc: "2026-10-23T04:10:00Z",
-          classification: "DRAFT_SIMULATION_ONLY",
-          regulatoryNotice: "DRAFT PAYLOAD — NOT SENT TO ANY REAL SYSTEM"
-        },
-        adverseEvent: {
-          drugTrigger: "CIPROFLOXACIN_500MG",
-          reactionType: "TYPE_1_HYPERSENSITIVITY_ANGIOEDEMA_RISK",
-          contraindicatedAction: "REPEAT_DOSE_STRICTLY_PROHIBITED"
-        },
-        pharmacologyConflict: {
-          interactingPair: ["WARFARIN_3MG", "CIPROFLOXACIN_500MG"],
-          mechanism: "CYP1A2_CYP2C9_INHIBITION_GUT_FLORA_DEPLETION",
-          consequence: "HIGH_BLEEDING_HEMORRHAGE_RISK",
-          recommendedAction: "INR_MONITORING_AND_ANTIBIOTIC_SWITCH"
-        }
-      },
-      safety_note: "CLINICAL PHARMACOLOGY NOTICE: This is an automated algorithmic safety check. SAARTHI AI does not prescribe, alter medications, or provide official diagnostic decisions. Contact a registered physician or emergency center immediately.",
-      follow_up_question: "Is she experiencing any hoarseness in her voice, coughing, or throat tightness right now?"
+      follow_up_question: "Are you parked on the northbound (towards Pune) or southbound lane, and what is your vehicle color/registration number for dispatch identification?",
+      followUpQuestions: [
+        "Are you parked on the northbound or southbound lane?",
+        "What is your vehicle color/registration number for dispatch identification?"
+      ]
     }
   }
 };

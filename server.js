@@ -114,22 +114,25 @@ function readJsonBody(req) {
   });
 }
 
-// Match closest demo preset based on keywords if in demo mode
-function findMatchingDemoPreset(inputText = '') {
+// Match closest demo preset based on keywords and context if in demo mode
+function findMatchingDemoPreset(inputText = '', context = 'auto') {
   const text = inputText.toLowerCase();
 
-  if (text.includes('chest') || text.includes('pain') || text.includes('khed') || text.includes('telma') || text.includes('toll')) {
-    return DEMO_PRESETS.medical_crisis.plan;
+  if (context === 'public_service' || text.includes('pension') || text.includes('benefit') || text.includes('udid') || text.includes('aadhaar') || text.includes('scheme') || text.includes('ration') || text.includes('cafe')) {
+    return DEMO_PRESETS.public_service.plan;
   }
-  if (text.includes('flood') || text.includes('minto') || text.includes('bus') || text.includes('wire') || text.includes('water')) {
+  if (context === 'health_notes' || text.includes('fatigue') || text.includes('metformin') || text.includes('ibuprofen') || text.includes('warfarin') || text.includes('doctor') || text.includes('clinician') || text.includes('symptom')) {
+    return DEMO_PRESETS.health_organization ? DEMO_PRESETS.health_organization.plan : DEMO_PRESETS.medical_crisis.plan;
+  }
+  if (context === 'community_safety' || text.includes('weather') || text.includes('storm') || text.includes('flood') || text.includes('minto') || text.includes('underpass') || text.includes('tree') || text.includes('wire') || text.includes('road')) {
     return DEMO_PRESETS.community_safety.plan;
   }
-  if (text.includes('warfarin') || text.includes('cipro') || text.includes('allergy') || text.includes('hives') || text.includes('swelling')) {
-    return DEMO_PRESETS.health_prescription_navigator.plan;
+  if (text.includes('chest') || text.includes('pain') || text.includes('heart') || text.includes('stemi') || text.includes('khed') || text.includes('toll')) {
+    return DEMO_PRESETS.medical_crisis.plan;
   }
 
-  // Default to medical crisis if generic
-  return DEMO_PRESETS.medical_crisis.plan;
+  // Default to community safety
+  return DEMO_PRESETS.community_safety.plan;
 }
 
 // Safe static file server
@@ -221,12 +224,12 @@ function createServer() {
           return;
         }
 
-        const { text, language, mode } = validation.cleaned;
+        const { text, language, mode, context } = validation.cleaned;
         const hasApiKey = Boolean(process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY.trim());
 
         // Check if demo mode was explicitly requested OR no API key is set
         if (mode === 'demo' || !hasApiKey) {
-          const demoPlan = findMatchingDemoPreset(text);
+          const demoPlan = findMatchingDemoPreset(text, context);
           sendJson(res, 200, {
             success: true,
             mode: 'demo',
@@ -243,6 +246,7 @@ function createServer() {
             text,
             image: body.image || null,
             language,
+            context,
             enableSearchGrounding: true
           });
 

@@ -143,7 +143,9 @@ const RESPONSE_SCHEMA = {
     },
     rawSystemPayload: { type: "OBJECT" },
     safety_note: { type: "STRING" },
-    follow_up_question: { type: "STRING" }
+    safetyNotes: { type: "ARRAY", items: { type: "STRING" } },
+    follow_up_question: { type: "STRING" },
+    followUpQuestions: { type: "ARRAY", items: { type: "STRING" } }
   },
   required: [
     "title", "intent", "urgency", "confidenceScore", "domain",
@@ -161,9 +163,9 @@ class GeminiService {
 
   /**
    * Primary analysis entry point
-   * @param {Object} params - { text, image, language, enableSearchGrounding }
+   * @param {Object} params - { text, image, language, context, enableSearchGrounding }
    */
-  async analyzeIntent({ text = '', image = null, language = 'en-IN', enableSearchGrounding = true }) {
+  async analyzeIntent({ text = '', image = null, language = 'en-IN', context = 'auto', enableSearchGrounding = true }) {
     if (!this.apiKey) {
       const err = new Error('GEMINI_API_KEY is not configured on the server. Switch to Demo Mode or configure .env');
       err.code = 'NO_API_KEY';
@@ -192,6 +194,7 @@ class GeminiService {
       text,
       image,
       language,
+      context,
       externalEvidence
     });
 
@@ -239,12 +242,23 @@ class GeminiService {
   /**
    * Structured JSON Synthesis pass
    */
-  async _generateStructuredContent({ text, image, language, externalEvidence = [] }) {
+  async _generateStructuredContent({ text, image, language, context = 'auto', externalEvidence = [] }) {
     const endpoint = `${GEMINI_API_BASE}/${GEMINI_MODEL}:generateContent`;
     const parts = [];
 
     // Context prefix
     let promptText = `INPUT COMMUNICATION (Language: ${language}):\n"""\n${text}\n"""\n`;
+
+    if (context && context !== 'auto') {
+      promptText += `\nUSER SELECTED CONTEXT: ${context.toUpperCase()}\n`;
+      if (context === 'health_notes') {
+        promptText += `CRITICAL HEALTH BOUNDARY: NEVER diagnose diseases, certify conditions, or prescribe/alter medications. Organize symptoms, history, and timeline clearly, and draft prioritized questions for the user to ask a qualified clinician.\n`;
+      } else if (context === 'public_service') {
+        promptText += `PUBLIC SERVICE NAVIGATION: Clearly distinguish user goal, missing eligibility details, official fee rules (warning against unauthorized intermediaries), and verified government portal paths.\n`;
+      } else if (context === 'community_safety') {
+        promptText += `COMMUNITY SAFETY: Clearly separate eyewitness statements from unconfirmed rumors. Prioritize physical safety and specify what official channels need verification without fabricating closures.\n`;
+      }
+    }
 
     if (externalEvidence && externalEvidence.length > 0) {
       promptText += `\nRETRIEVED EXTERNAL GROUNDING EVIDENCE (Use only these real sources for any 'Verified' claims):\n`;
