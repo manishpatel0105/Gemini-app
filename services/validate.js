@@ -16,7 +16,8 @@ const VALID_VERIFICATION_STATUSES = [
   'Partially verified',
   'Unverified',
   'Contradicted',
-  'Verification unavailable'
+  'Verification unavailable',
+  'Not independently verified'
 ];
 
 const ALLOWED_MIME_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];

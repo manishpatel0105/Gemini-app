@@ -363,16 +363,13 @@ const UI = (() => {
           statusSpan.textContent = '✓ Verified';
         } else if (statusLower.includes('partial')) {
           statusSpan.className += ' status-partially-verified';
-          statusSpan.textContent = '◐ Partial';
+          statusSpan.textContent = '◐ Partially verified';
         } else if (statusLower === 'contradicted') {
           statusSpan.className += ' status-contradicted';
           statusSpan.textContent = '✕ Contradicted';
-        } else if (statusLower.includes('unavailable')) {
-          statusSpan.className += ' status-verification-unavailable';
-          statusSpan.textContent = '⊘ Unavailable';
         } else {
-          statusSpan.className += ' status-unverified';
-          statusSpan.textContent = '? Unverified';
+          statusSpan.className += ' status-verification-unavailable';
+          statusSpan.textContent = '⊘ Not independently verified';
         }
 
         topRow.appendChild(claimText);
