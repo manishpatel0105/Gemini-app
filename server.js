@@ -216,13 +216,14 @@ function sendError(res, statusCode, message, code = 'ERROR', details = null, ext
   });
 }
 
-// Server factory for testing and production
-function createServer() {
-  const geminiService = new GeminiService();
+// Request handler factory for both standalone HTTP and Serverless Function environments
+function createRequestHandler(customGeminiService = null) {
+  const geminiService = customGeminiService || new GeminiService();
 
-  const server = http.createServer(async (req, res) => {
+  return async (req, res) => {
     const startTime = Date.now();
-    const clientIp = req.socket.remoteAddress || '127.0.0.1';
+    const forwarded = req.headers && req.headers['x-forwarded-for'];
+    const clientIp = (typeof forwarded === 'string' ? forwarded.split(',')[0].trim() : null) || (req.socket && req.socket.remoteAddress) || '127.0.0.1';
     const parsedUrl = new URL(req.url, 'http://localhost');
 
     // Concise, privacy-preserving operational logger (never logs bodies or personal notes)
@@ -362,9 +363,13 @@ function createServer() {
 
     // Method not allowed
     sendError(res, 405, `Method ${req.method} not allowed.`, 'METHOD_NOT_ALLOWED');
-  });
+  };
+}
 
-  return server;
+// Server factory for testing and standalone production execution
+function createServer(customGeminiService = null) {
+  const handler = createRequestHandler(customGeminiService);
+  return http.createServer(handler);
 }
 
 // Start standalone server when run directly
@@ -392,4 +397,9 @@ if (require.main === module) {
   process.on('SIGTERM', shutdown);
 }
 
-module.exports = { createServer, readJsonBody, checkRateLimit };
+module.exports = {
+  createServer,
+  createRequestHandler,
+  readJsonBody,
+  checkRateLimit
+};

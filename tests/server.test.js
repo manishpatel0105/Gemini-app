@@ -164,4 +164,21 @@ test('Server startup, health endpoint, static serving, and API validation', asyn
     assert.strictEqual(data.stack, undefined, 'Stack trace must NEVER be sent to client');
     assert.ok(!JSON.stringify(data).includes('/Users/'), 'Internal filesystem paths must not be exposed');
   });
+
+  // Test 11: Vercel serverless function entrypoint (api/index.js) behaves reliably
+  await t.test('Vercel serverless handler (api/index.js) operates reliably', async () => {
+    const vercelHandler = require('../api/index');
+    const vercelServer = http.createServer(vercelHandler);
+    await new Promise((resolve) => vercelServer.listen(0, '127.0.0.1', resolve));
+    const vPort = vercelServer.address().port;
+    try {
+      const vRes = await fetch(`http://127.0.0.1:${vPort}/api/health`);
+      assert.strictEqual(vRes.status, 200);
+      const vData = await vRes.json();
+      assert.strictEqual(vData.status, 'ok');
+      assert.strictEqual(vData.application, 'SAARTHI AI');
+    } finally {
+      await new Promise((resolve) => vercelServer.close(resolve));
+    }
+  });
 });

@@ -28,27 +28,27 @@ Powered by **Google Gemini**, SAARTHI AI:
 ## 🏛️ System Architecture
 
 ```mermaid
-graph TD
-    A[Human Distress Signal: Hinglish/Hindi/English/Voice/Photo] --> B[Human Input Hub: Web Speech + Multimodal Image]
-    B --> C[Node.js Standard HTTP Server: Zero Runtime NPM]
+flowchart TD
+    A["Human Distress Signal: Hinglish/Hindi/English/Voice/Photo"] --> B["Human Input Hub: Web Speech + Multimodal Image"]
+    B --> C["Node.js Standard HTTP Server: Zero Runtime NPM"]
     
-    C --> D{Live Gemini Key Present?}
-    D -- No / Demo Mode --> E[Deterministic Fixtures (demoData.js)]
-    D -- Yes / Live Mode --> F[Gemini Flash REST Client]
+    C --> D{"Live Gemini Key Present?"}
+    D -- "No / Demo Mode" --> E["Deterministic Fixtures (demoData.js)"]
+    D -- "Yes / Live Mode" --> F["Gemini Flash Client (REST API)"]
     
-    F --> G[Pass 1: Google Search Grounding Retrieval]
-    G --> H[Pass 2: Structured JSON Synthesis (responseSchema)]
+    F --> G["Pass 1: Google Search Grounding Retrieval"]
+    G --> H["Pass 2: Structured JSON Synthesis (responseSchema)"]
     
-    H --> I[Validation & Safeguards (services/validate.js)]
+    H --> I["Validation & Safeguards (services/validate.js)"]
     E --> I
     
-    I --> J[Deterministic Emergency Overrides (Cardiac / Fire / Flood / Wire)]
-    I --> K[Grounding Citation Correlation & Verification Downgrades]
-    I --> L[Draft Status Enforcement: sent=false & humanApproval=true]
+    I --> J["Deterministic Emergency Overrides (Cardiac / Respiratory / Flood / Wire)"]
+    I --> K["Grounding Citation Correlation & Verification Downgrades"]
+    I --> L["Draft Status Enforcement (sent=false & humanApproval=true)"]
     
-    L --> M[Enterprise Decision Workspace (2 Balanced Columns)]
-    M --> N[Column 1: Distress Stream, Presets & Toolbar (~40%)]
-    M --> O[Column 2: Decision Workspace, Hero Step & Directives (~60%)]
+    L --> M["Enterprise Decision Workspace (2 Balanced Columns)"]
+    M --> N["Column 1: Distress Stream, Presets & Toolbar (~40%)"]
+    M --> O["Column 2: Decision Workspace, Hero Step & Directives (~60%)"]
 ```
 
 ---
