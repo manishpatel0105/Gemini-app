@@ -28,7 +28,7 @@ test('Server startup, health endpoint, static serving, and API validation', asyn
     const data = await res.json();
     assert.strictEqual(data.status, 'ok');
     assert.strictEqual(data.application, 'SAARTHI AI');
-    assert.strictEqual(data.model, 'gemini-2.5-flash');
+    assert.ok(typeof data.model === 'string' && data.model.startsWith('gemini-'));
     assert.ok(data.features.speechRecognition);
   });
 

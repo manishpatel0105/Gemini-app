@@ -225,7 +225,7 @@ function createServer() {
         status: 'ok',
         application: 'SAARTHI AI',
         version: '1.0.0',
-        model: 'gemini-2.5-flash',
+        model: process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite',
         mode: hasApiKey ? 'live' : 'demo',
         hasApiKey,
         timestamp: new Date().toISOString(),
