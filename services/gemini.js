@@ -156,9 +156,17 @@ const RESPONSE_SCHEMA = {
 };
 
 class GeminiService {
-  constructor(apiKey = process.env.GEMINI_API_KEY) {
-    this.apiKey = apiKey;
+  constructor(apiKey = null) {
+    this._explicitApiKey = apiKey;
     this.verificationAdapter = new VerificationAdapter();
+  }
+
+  get apiKey() {
+    return this._explicitApiKey || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '';
+  }
+
+  set apiKey(val) {
+    this._explicitApiKey = val;
   }
 
   /**

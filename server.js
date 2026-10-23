@@ -13,6 +13,34 @@ const { GeminiService } = require('./services/gemini');
 const { validateAnalyzeRequest } = require('./services/validate');
 const { DEMO_PRESETS } = require('./public/demoData');
 
+// Zero-dependency .env loader
+function loadEnv() {
+  const envPath = path.resolve(__dirname, '.env');
+  if (fs.existsSync(envPath)) {
+    try {
+      const content = fs.readFileSync(envPath, 'utf8');
+      for (const line of content.split(/\r?\n/)) {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith('#')) continue;
+        const eqIdx = trimmed.indexOf('=');
+        if (eqIdx !== -1) {
+          const key = trimmed.slice(0, eqIdx).trim();
+          let val = trimmed.slice(eqIdx + 1).trim();
+          if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+            val = val.slice(1, -1);
+          }
+          if (val) {
+            process.env[key] = val;
+          }
+        }
+      }
+    } catch {
+      // Ignore reading error
+    }
+  }
+}
+loadEnv();
+
 const PORT = parseInt(process.env.PORT || '3000', 10);
 const HOST = process.env.HOST || '0.0.0.0';
 const PUBLIC_DIR = path.resolve(__dirname, 'public');
