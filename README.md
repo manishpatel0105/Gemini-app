@@ -1,9 +1,9 @@
 # 🛡️ SAARTHI AI — Universal Human Intent-to-System Action Engine
 > *"From human confusion to verified action."*
 
-[![Gemini Flash](https://img.shields.io/badge/Model-Gemini%20Flash-blue.svg)](https://deepmind.google/technologies/gemini/)
+[![Gemini Flash](https://img.shields.io/badge/Model-Gemini%20Flash%20Lite-blue.svg)](https://deepmind.google/technologies/gemini/)
 [![Zero NPM Dependencies](https://img.shields.io/badge/Dependencies-Zero%20Runtime%20NPM-emerald.svg)](https://nodejs.org)
-[![Repository Size](https://img.shields.io/badge/Repo%20Size-%3C%20250%20KB%20(Limit%2010MB)-cyan.svg)](scripts/repo-size.js)
+[![Repository Size](https://img.shields.io/badge/Repo%20Size-%3C%20260%20KB%20(Limit%2010MB)-cyan.svg)](scripts/repo-size.js)
 [![Test Suite](https://img.shields.io/badge/Tests-36%20Passing-brightgreen.svg)](tests/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
@@ -59,7 +59,7 @@ graph TD
 | :--- | :--- |
 | **Runtime Dependencies** | **Zero runtime npm dependencies**. Powered entirely by Node.js built-ins (`http`, `fs`, `path`, `crypto`, native `fetch`). |
 | **Repository Size** | **~241 KB** total working tree size (Strict limit: < 10 MB). Uses `scripts/repo-size.js` for automated audit. |
-| **Model** | **Google Gemini** (`gemini-3.1-flash-lite` or `gemini-2.5-flash`) via official Google REST API (`x-goog-api-key`). |
+| **Model** | **Google Gemini Flash Lite** (default: `gemini-3.1-flash-lite`, configurable via `GEMINI_MODEL` env var) via official Google REST API (`x-goog-api-key`). |
 | **Multimodal** | Audio speech recognition via browser Web Speech API (`en-IN`, `hi-IN`); scene photos up to 4 MB (PNG, JPEG, WEBP) with binary magic byte validation. |
 | **API Key Privacy** | `GEMINI_API_KEY` is exclusively read on the server. Never leaked to client code, Git, or API responses. |
 | **Judge Demo Mode** | Full offline exploration mode with deterministic high-fidelity fixtures in `public/demoData.js`. Persistent warning banner displayed. |

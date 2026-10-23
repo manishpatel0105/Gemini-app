@@ -274,7 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.dropArea.addEventListener(eventName, (e) => {
       e.preventDefault();
       e.stopPropagation();
-      elements.dropArea.classList.add('border-cyan-400', 'bg-slate-900');
+      elements.dropArea.classList.add('border-blue-400', 'bg-blue-50');
     });
   });
 
@@ -282,7 +282,7 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.dropArea.addEventListener(eventName, (e) => {
       e.preventDefault();
       e.stopPropagation();
-      elements.dropArea.classList.remove('border-cyan-400', 'bg-slate-900');
+      elements.dropArea.classList.remove('border-blue-400', 'bg-blue-50');
     });
   });
 

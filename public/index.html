@@ -6,6 +6,9 @@
   <title>SAARTHI AI — Universal Human Intent-to-System Action Engine</title>
   <meta name="description" content="Transforms messy, panicked multilingual human inputs into structured, evidence-aware, prioritized operational actions powered by Google Gemini 2.5 Flash.">
   
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232563eb'/%3E%3Cpath d='M16 6 L22 10 L22 16 Q22 22 16 26 Q10 22 10 16 L10 10 Z' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
+
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -420,7 +423,7 @@
       <div id="action-loading-state" class="hidden"></div>
 
       <!-- Populated State: Section 1 (Situation Assessment & Intent) -->
-      <div id="bridge-content" class="hidden flex-col gap-4">
+      <div id="bridge-content" class="hidden gap-4" style="display:none; flex-direction:column;">
         <!-- Situation Card -->
         <div class="eoc-card p-5 sm:p-6 space-y-4">
           <!-- Top Row: Badges & Confidence -->
@@ -577,7 +580,7 @@
       </div>
 
       <!-- Populated State: Section 2 (Actions, Guidance & Directives) -->
-      <div id="action-content" class="hidden flex-col gap-4">
+      <div id="action-content" class="hidden gap-4" style="display:none; flex-direction:column;">
 
         <div class="eoc-card p-5 sm:p-6 space-y-4">
 
@@ -654,7 +657,7 @@
                 <span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
                 <span>DISPATCH SIMULATOR TERMINAL</span>
               </span>
-              <button id="close-sim-btn" class="text-slate-500 hover:text-slate-300">×</button>
+              <button id="close-sim-btn" class="text-slate-500 hover:text-slate-300 w-5 h-5 flex items-center justify-center rounded hover:bg-slate-700 transition-colors" aria-label="Close simulation console">×</button>
             </div>
             
             <div class="bg-amber-950/80 border border-amber-800 p-1.5 rounded text-[10px] text-amber-300 font-bold text-center">
@@ -721,8 +724,8 @@
   </footer>
 
   <!-- Scripts -->
-  <script src="demoData.js?v=enterprise"></script>
-  <script src="ui.js?v=enterprise"></script>
-  <script src="app.js?v=enterprise"></script>
+  <script src="demoData.js?v=2.0"></script>
+  <script src="ui.js?v=2.0"></script>
+  <script src="app.js?v=2.0"></script>
 </body>
 </html>

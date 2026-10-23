@@ -1,8 +1,9 @@
 /**
- * SAARTHI AI — Google Gemini 2.5 Flash REST Client
+ * SAARTHI AI — Google Gemini REST Client
  * 
- * Interacts directly with Google's official Gemini REST API:
- * https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent
+ * Interacts directly with Google's official Gemini REST API.
+ * Model: configured via GEMINI_MODEL env var (default: gemini-3.1-flash-lite)
+ * API: https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent
  * 
  * Features:
  * - Direct REST implementation using Node.js built-in fetch API (zero external runtime dependencies)

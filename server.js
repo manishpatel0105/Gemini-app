@@ -2,7 +2,7 @@
  * SAARTHI AI — Universal Human Intent-to-System Action Engine
  * Minimal Production-Grade HTTP Server (Zero Runtime npm Dependencies)
  * 
- * Powered by Google Gemini 2.5 Flash
+ * Powered by Google Gemini (model configured via GEMINI_MODEL env var)
  */
 
 const http = require('node:http');

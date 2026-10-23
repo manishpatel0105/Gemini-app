@@ -120,10 +120,12 @@ const UI = (() => {
     if (isLoading) {
       elements.bridgeEmptyState.classList.add('hidden');
       elements.bridgeContent.classList.add('hidden');
+      elements.bridgeContent.style.display = 'none';
       elements.bridgeLoadingState.classList.remove('hidden');
 
       elements.actionEmptyState.classList.add('hidden');
       elements.actionContent.classList.add('hidden');
+      elements.actionContent.style.display = 'none';
       elements.actionLoadingState.classList.remove('hidden');
 
       elements.btnAnalyze.disabled = true;
@@ -201,8 +203,10 @@ const UI = (() => {
     // Reset columns
     elements.bridgeEmptyState.classList.remove('hidden');
     elements.bridgeContent.classList.add('hidden');
+    elements.bridgeContent.style.display = 'none';
     elements.actionEmptyState.classList.remove('hidden');
     elements.actionContent.classList.add('hidden');
+    elements.actionContent.style.display = 'none';
     elements.simulationConsole.classList.add('hidden');
     elements.caseBadge.textContent = 'CASE #READY';
     if (elements.heroActionStep) elements.heroActionStep.textContent = '...';
@@ -476,7 +480,7 @@ const UI = (() => {
     const guidance = plan.humanGuidance || [];
     guidance.forEach((step, i) => {
       const li = createElement('li', 'flex items-start gap-2.5 p-2.5 rounded-md bg-slate-50 border border-slate-200');
-      const stepNum = createElement('span', 'h-5 w-5 rounded-full bg-slate-200 text-slate-700 text-xs font-semibold flex items-center justify-center shrink-0 mt-0.5', String(i + 1));
+      const stepNum = createElement('span', 'guidance-step-num h-5 w-5 min-w-[20px] rounded-full text-xs flex items-center justify-center shrink-0 mt-0.5', String(i + 1));
       const stepText = createElement('p', 'text-xs text-slate-800 leading-snug', step);
       li.appendChild(stepNum);
       li.appendChild(stepText);
@@ -551,11 +555,13 @@ const UI = (() => {
       elements.safetyNoteText.textContent = safetyList.join('\n\n');
     }
 
-    // Unhide panels
+    // Unhide panels using flex layout
     elements.bridgeEmptyState.classList.add('hidden');
     elements.bridgeContent.classList.remove('hidden');
+    elements.bridgeContent.style.display = 'flex';
     elements.actionEmptyState.classList.add('hidden');
     elements.actionContent.classList.remove('hidden');
+    elements.actionContent.style.display = 'flex';
 
     if (window.lucide) window.lucide.createIcons();
     announceToScreenReader(`Action plan synthesized. Urgency: ${urgency}. Title: ${plan.title}`);
