@@ -1,64 +1,123 @@
 /**
- * SAARTHI AI — Emergency Operations Center (EOC) Styling
- * Visual Design: Industrial Mission-Control Utilitarian with High-Contrast Status Indicators
+ * SAARTHI AI — Modern Enterprise Design System & Visual Polish
+ * Color Direction: Sophisticated Blue & Teal palette with restrained Indigo accents
+ * Focus: Crisp depth, accessible contrast, 8px spatial rhythm, zero neon/gaming aesthetic
  */
 
 :root {
-  --bg-dark: #06090e;
-  --panel-bg: #0c1322;
-  --card-bg: #111a2e;
-  --border-subtle: #1a263e;
-  --border-focus: #14b8a6;
-  --color-emergency: #f43f5e;
-  --color-warning: #f59e0b;
-  --color-safe: #10b981;
-  --color-teal: #14b8a6;
-  --color-cyan: #06b6d4;
-  --color-indigo: #6366f1;
+  /* Surface & Page Canvas */
+  --bg-canvas: #f1f5f9;
+  --bg-surface: #ffffff;
+  --bg-surface-subtle: #f8fafc;
+  --surface-blue-subtle: #eff6ff;
+  --surface-teal-subtle: #f0fdfa;
+  --surface-indigo-subtle: #eef2ff;
+
+  /* Typography */
+  --text-primary: #172033;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+
+  /* Structural Borders */
+  --border-default: #dce4ef;
+  --border-subtle: #edf2f7;
+  --border-focus: #2563eb;
+
+  /* Brand Accents */
+  --color-primary: #2563eb;
+  --color-primary-deep: #1d4ed8;
+  --color-teal: #0f9d91;
+  --color-teal-dark: #0f766e;
+  --color-indigo: #4f46e5;
+
+  /* State Tokens (Accessible colors on pale backgrounds) */
+  --color-critical: #991b1b;
+  --bg-critical-subtle: #fef2f2;
+  --border-critical: #fecaca;
+
+  --color-warning: #92400e;
+  --bg-warning-subtle: #fffbeb;
+  --border-warning: #fde68a;
+
+  --color-verified: #0f766e;
+  --bg-verified-subtle: #f0fdfa;
+  --border-verified: #ccfbf1;
 }
 
-/* Background Subtle Tactical Grid */
+/* Page Background with Subtle Ambient Blue-Tinted Radial Glow */
 body {
-  background-color: var(--bg-dark);
-  background-image: 
-    radial-gradient(rgba(30, 41, 59, 0.25) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(6, 9, 14, 0.95), rgba(6, 9, 14, 0.98));
-  background-size: 24px 24px, 100% 100%;
-  color: #f1f5f9;
+  background-color: var(--bg-canvas);
+  background-image: radial-gradient(circle at 50% -40px, rgba(37, 99, 235, 0.055) 0%, rgba(15, 157, 145, 0.035) 40%, transparent 70%);
+  background-repeat: no-repeat;
+  color: var(--text-primary);
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Tactical EOC Card */
+/* Primary Workspace Cards */
 .eoc-card {
-  background: linear-gradient(180deg, #0d1527 0%, #090e1a 100%);
-  border: 1px solid var(--border-subtle);
-  box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .eoc-card:hover {
-  border-color: rgba(30, 48, 80, 0.9);
+  border-color: #cbd5e1;
 }
 
 /* Preset Pills */
 .preset-pill {
-  box-shadow: 0 2px 8px -1px rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--border-default);
+  background-color: #ffffff;
+  transition: all 0.15s ease;
 }
 
 .preset-pill:hover {
-  transform: translateY(-1px);
+  border-color: #94a3b8;
+  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.03);
 }
 
 .preset-pill:active {
-  transform: translateY(0);
+  transform: scale(0.99);
 }
 
-/* Focus Visible */
+/* Primary Analyze Button */
+#btn-analyze {
+  background-color: var(--color-primary);
+  color: #ffffff;
+  box-shadow: 0 1px 2px 0 rgba(37, 99, 235, 0.2);
+  transition: all 0.15s ease;
+}
+
+#btn-analyze:hover:not(:disabled) {
+  background-color: var(--color-primary-deep);
+  box-shadow: 0 2px 4px -1px rgba(37, 99, 235, 0.3);
+}
+
+#btn-analyze:active:not(:disabled) {
+  background-color: #1e40af;
+}
+
+/* Focus Visible Accessibility */
 button:focus-visible,
 textarea:focus-visible,
 select:focus-visible,
-input:focus-visible {
+input:focus-visible,
+a:focus-visible {
   outline: 2px solid var(--border-focus);
   outline-offset: 2px;
+}
+
+/* Form Controls Focus & Selected States */
+textarea:focus,
+select:focus,
+input:focus {
+  border-color: var(--border-focus);
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
 /* Custom Scrollbars */
@@ -68,114 +127,137 @@ input:focus-visible {
 }
 
 ::-webkit-scrollbar-track {
-  background: #090e1a;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
+  background: #cbd5e1;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #94a3b8;
 }
 
-/* Urgency Status Colors */
+/* Urgency Status Badges */
 .badge-immediate {
-  background-color: rgba(244, 63, 94, 0.18);
-  color: #fda4af;
-  border: 1px solid rgba(244, 63, 94, 0.5);
-  box-shadow: 0 0 12px rgba(244, 63, 94, 0.2);
+  background-color: var(--bg-critical-subtle);
+  color: var(--color-critical);
+  border: 1px solid var(--border-critical);
+  font-weight: 600;
 }
 
 .badge-high {
-  background-color: rgba(245, 158, 11, 0.18);
-  color: #fde68a;
-  border: 1px solid rgba(245, 158, 11, 0.5);
+  background-color: var(--bg-warning-subtle);
+  color: var(--color-warning);
+  border: 1px solid var(--border-warning);
+  font-weight: 600;
 }
 
 .badge-moderate {
-  background-color: rgba(6, 182, 212, 0.18);
-  color: #a5f3fc;
-  border: 1px solid rgba(6, 182, 212, 0.5);
+  background-color: var(--surface-blue-subtle);
+  color: #1e40af;
+  border: 1px solid #bfdbfe;
+  font-weight: 600;
 }
 
 .badge-low {
-  background-color: rgba(16, 185, 129, 0.18);
-  color: #a7f3d0;
-  border: 1px solid rgba(16, 185, 129, 0.5);
+  background-color: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+  font-weight: 600;
 }
 
 .badge-unclear {
-  background-color: rgba(100, 116, 139, 0.18);
-  color: #cbd5e1;
-  border: 1px solid rgba(100, 116, 139, 0.5);
+  background-color: var(--bg-canvas);
+  color: #475569;
+  border: 1px solid var(--border-default);
+  font-weight: 600;
 }
 
-/* Verification Badges */
+/* Grounding & Verification Badges */
 .status-verified {
-  background: rgba(16, 185, 129, 0.15);
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.4);
+  background: var(--bg-verified-subtle);
+  color: var(--color-verified);
+  border: 1px solid var(--border-verified);
+  font-weight: 600;
 }
 
 .status-partially-verified {
-  background: rgba(6, 182, 212, 0.15);
-  color: #22d3ee;
-  border: 1px solid rgba(6, 182, 212, 0.4);
+  background: var(--surface-blue-subtle);
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+  font-weight: 600;
 }
 
 .status-unverified {
-  background: rgba(245, 158, 11, 0.15);
-  color: #fbbf24;
-  border: 1px solid rgba(245, 158, 11, 0.4);
+  background: var(--bg-warning-subtle);
+  color: var(--color-warning);
+  border: 1px solid var(--border-warning);
+  font-weight: 600;
 }
 
 .status-contradicted {
-  background: rgba(244, 63, 94, 0.15);
-  color: #fb7185;
-  border: 1px solid rgba(244, 63, 94, 0.4);
+  background: var(--bg-critical-subtle);
+  color: var(--color-critical);
+  border: 1px solid var(--border-critical);
+  font-weight: 600;
 }
 
 .status-verification-unavailable {
-  background: rgba(148, 163, 184, 0.15);
-  color: #94a3b8;
-  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: var(--bg-canvas);
+  color: var(--text-muted);
+  border: 1px solid var(--border-default);
+  font-weight: 600;
 }
 
 /* Action Directive Cards */
 .action-card {
-  background: #0d1527;
-  border: 1px solid #1a2744;
-  border-left: 3px solid #06b6d4;
-  transition: all 0.2s ease;
+  background: #ffffff;
+  border: 1px solid var(--border-default);
+  border-left: 3px solid var(--color-primary);
+  border-radius: 6px;
+  box-shadow: 0 1px 2px 0 rgba(15, 23, 42, 0.03);
+  transition: all 0.15s ease;
 }
 
 .action-card.action-critical {
-  border-left-color: #f43f5e;
+  border-left-color: #dc2626;
 }
 
 .action-card.action-high {
-  border-left-color: #f59e0b;
+  border-left-color: #d97706;
 }
 
 .action-card:hover {
-  background: #111b33;
-  border-color: #2a3d66;
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 5px rgba(15, 23, 42, 0.04);
 }
 
-/* Pulse animation for active voice/recording */
-@keyframes voicePulse {
-  0% { transform: scale(1); opacity: 0.8; }
-  50% { transform: scale(1.15); opacity: 1; }
-  100% { transform: scale(1); opacity: 0.8; }
+/* Workflow Step Accent Cards */
+.workflow-step-blue {
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
 }
 
-.recording-pulse {
-  animation: voicePulse 1.2s infinite ease-in-out;
+.workflow-step-teal {
+  background: #f0fdfa;
+  border: 1px solid #ccfbf1;
 }
 
-/* Respect prefers-reduced-motion */
+.workflow-step-indigo {
+  background: #eef2ff;
+  border: 1px solid #e0e7ff;
+}
+
+/* Hero Action Directive */
+#hero-action-card {
+  background-color: var(--surface-blue-subtle);
+  border: 1px solid #bfdbfe;
+  border-left: 4px solid var(--color-primary);
+}
+
+/* Reduced Motion Preference */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

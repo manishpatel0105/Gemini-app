@@ -4,7 +4,7 @@
 
 const test = require('node:test');
 const assert = require('node:assert');
-const { GeminiService } = require('../services/gemini');
+const { GeminiService, fetchWithTransientRetry } = require('../services/gemini');
 
 test('GeminiService throws error if initialized without GEMINI_API_KEY', async () => {
   const service = new GeminiService('');
@@ -197,6 +197,110 @@ test('GeminiService parses structured candidates and correlates evidence', async
     assert.strictEqual(result.draftPayloads[0].sent, false);
     // Verification claim should have been correlated with the real grounding URI
     assert.ok(result.verification.length > 0);
+  } finally {
+    global.fetch = originalFetch;
+  }
+});
+
+test('fetchWithTransientRetry retries on 503 and succeeds on subsequent attempt', async () => {
+  const originalFetch = global.fetch;
+  let callCount = 0;
+
+  global.fetch = async () => {
+    callCount++;
+    if (callCount === 1) {
+      return { status: 503, ok: false };
+    }
+    return { status: 200, ok: true, json: async () => ({ success: true }) };
+  };
+
+  try {
+    const res = await fetchWithTransientRetry('https://fake-endpoint.api', {}, 2);
+    assert.strictEqual(res.status, 200);
+    assert.strictEqual(callCount, 2, 'Should have retried once after 503');
+  } finally {
+    global.fetch = originalFetch;
+  }
+});
+
+test('fetchWithTransientRetry fast-fails non-retryable 4xx errors without retrying', async () => {
+  const originalFetch = global.fetch;
+  let callCount = 0;
+
+  global.fetch = async () => {
+    callCount++;
+    return { status: 401, ok: false };
+  };
+
+  try {
+    const res = await fetchWithTransientRetry('https://fake-endpoint.api', {}, 2);
+    assert.strictEqual(res.status, 401);
+    assert.strictEqual(callCount, 1, 'Should NOT retry 401 Unauthorized');
+  } finally {
+    global.fetch = originalFetch;
+  }
+});
+
+test('GeminiService.analyzeIntent throws MALFORMED_OUTPUT (502) when model output is invalid JSON', async () => {
+  const service = new GeminiService('valid_test_key');
+  const originalFetch = global.fetch;
+
+  global.fetch = async () => {
+    return {
+      ok: true,
+      status: 200,
+      json: async () => ({
+        candidates: [
+          {
+            content: {
+              parts: [{ text: '<<<NOT JSON>>> Here is some plain conversational response instead of JSON' }]
+            }
+          }
+        ]
+      })
+    };
+  };
+
+  try {
+    await assert.rejects(
+      async () => {
+        await service.analyzeIntent({ text: 'Accident on expressway', enableSearchGrounding: false });
+      },
+      (err) => {
+        assert.strictEqual(err.code, 'MALFORMED_OUTPUT');
+        assert.strictEqual(err.statusCode, 502);
+        assert.ok(err.message.includes('Model output did not conform to JSON'));
+        return true;
+      }
+    );
+  } finally {
+    global.fetch = originalFetch;
+  }
+});
+
+test('GeminiService.analyzeIntent throws EMPTY_RESPONSE (502) when model returns empty candidates', async () => {
+  const service = new GeminiService('valid_test_key');
+  const originalFetch = global.fetch;
+
+  global.fetch = async () => {
+    return {
+      ok: true,
+      status: 200,
+      json: async () => ({ candidates: [] })
+    };
+  };
+
+  try {
+    await assert.rejects(
+      async () => {
+        await service.analyzeIntent({ text: 'Accident on expressway', enableSearchGrounding: false });
+      },
+      (err) => {
+        assert.strictEqual(err.code, 'EMPTY_RESPONSE');
+        assert.strictEqual(err.statusCode, 502);
+        return true;
+      }
+    );
   } finally {
     global.fetch = originalFetch;
   }

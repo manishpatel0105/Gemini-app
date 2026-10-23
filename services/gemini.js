@@ -35,6 +35,13 @@ RULES & OPERATIONAL ETHICS:
 9. Verification rules: For claims, if no verified external evidence is provided, mark status as "Unverified" or "Verification unavailable". NEVER invent fake URLs, fake helpline numbers, or fake statistics.
 10. Include an appropriate safety_note and one high-priority follow_up_question to clarify the most critical unknown.
 11. Output MUST BE valid, strict JSON matching the exact schema requested.
+
+CLINICAL & HEALTH SAFETY MANDATE:
+- NON-DIAGNOSTIC PRINCIPLE: SAARTHI AI is an information-structuring and operational decision-support tool, NOT a physician or diagnostic instrument. NEVER diagnose a clinical illness or state that the patient has a confirmed disease. Frame findings strictly as "reported symptoms", "observational notes for clinician review", or "risk factors to discuss with a healthcare professional".
+- NO MEDICATION DOSING OR CHANGES: NEVER prescribe medications, calculate drug dosages, or instruct patients to start, stop, or change prescription medication schedules. Any medication discussion must advise immediate consultation with a qualified doctor or pharmacist.
+- TIMELY PROFESSIONAL EVALUATION: For acute or potentially life-threatening symptoms (e.g. chest pain, severe dyspnea/shortness of breath, loss of consciousness, uncontrolled hemorrhage, acute neurological deficits), immediately recommend emergency services (dial 112 / 108 in India). For non-acute medical symptoms, recommend timely in-person evaluation by a registered healthcare professional.
+- PROPORTIONALITY: Keep safety guidance strictly proportional to the actual input without hyperbolic exaggerations, and clearly distinguish general situational information from formal medical advice.
+- HUMAN-IN-THE-LOOP: Every operational action directive and system dispatch payload must remain in draft state requiring explicit human operator review.
 `;
 
 const RESPONSE_SCHEMA = {
@@ -154,6 +161,40 @@ const RESPONSE_SCHEMA = {
     "safety_note", "follow_up_question"
   ]
 };
+
+/**
+ * Helper to fetch with bounded exponential backoff retries for transient HTTP errors
+ * Retries ONLY on 502, 503, 504, or network connection dropouts.
+ * Never retries non-retryable 4xx errors (400, 401, 403, 404, 429).
+ */
+async function fetchWithTransientRetry(url, options, maxRetries = 2) {
+  let attempt = 0;
+  while (true) {
+    attempt++;
+    try {
+      const response = await fetch(url, options);
+
+      // If transient 502, 503, or 504 and attempts remain, retry after short delay
+      if ([502, 503, 504].includes(response.status) && attempt <= maxRetries) {
+        const delayMs = attempt * 400;
+        await new Promise(r => setTimeout(r, delayMs));
+        continue;
+      }
+
+      return response;
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        throw err; // Do not retry aborted timeouts
+      }
+      if (attempt <= maxRetries) {
+        const delayMs = attempt * 400;
+        await new Promise(r => setTimeout(r, delayMs));
+        continue;
+      }
+      throw err;
+    }
+  }
+}
 
 class GeminiService {
   constructor(apiKey = null) {
@@ -310,7 +351,7 @@ class GeminiService {
     const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
     try {
-      const response = await fetch(endpoint, {
+      const response = await fetchWithTransientRetry(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -330,7 +371,10 @@ class GeminiService {
       const candidate = data.candidates && data.candidates[0];
 
       if (!candidate || !candidate.content || !candidate.content.parts || !candidate.content.parts[0]) {
-        throw new Error('Gemini returned an empty or invalid response structure.');
+        const emptyErr = new Error('Gemini returned an empty or invalid response structure.');
+        emptyErr.code = 'EMPTY_RESPONSE';
+        emptyErr.statusCode = 502;
+        throw emptyErr;
       }
 
       const rawJsonText = candidate.content.parts[0].text;
@@ -339,7 +383,10 @@ class GeminiService {
         parsedJson = JSON.parse(rawJsonText);
       } catch (parseErr) {
         console.error('Failed to parse Gemini JSON output:', rawJsonText);
-        throw new Error(`Model output did not conform to JSON: ${parseErr.message}`);
+        const jsonErr = new Error(`Model output did not conform to JSON: ${parseErr.message}`);
+        jsonErr.code = 'MALFORMED_OUTPUT';
+        jsonErr.statusCode = 502;
+        throw jsonErr;
       }
 
       // Check for any candidate grounding metadata
@@ -398,6 +445,9 @@ class GeminiService {
     } else if (status === 401 || status === 403) {
       code = 'INVALID_API_KEY';
       message = 'Invalid or unauthorized GEMINI_API_KEY. Please verify your API key in .env or switch to Demo Mode.';
+    } else if (status === 404) {
+      code = 'MODEL_NOT_FOUND';
+      message = `Configured Gemini model is not available or not supported for this API key. ${errorDetails}`;
     } else if (status === 429) {
       code = 'RATE_LIMIT_EXCEEDED';
       message = 'Gemini API quota or rate limit exceeded. Please wait a moment or test using Demo Mode.';
@@ -415,6 +465,7 @@ class GeminiService {
 
 module.exports = {
   GeminiService,
+  fetchWithTransientRetry,
   GEMINI_MODEL,
   RESPONSE_SCHEMA,
   SYSTEM_INSTRUCTION

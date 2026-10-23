@@ -1,62 +1,24 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SAARTHI AI — Universal Human Intent-to-System Action Engine</title>
-  <meta name="description" content="Transforms messy, panicked multilingual human inputs into structured, evidence-aware, prioritized emergency actions powered by Google Gemini 2.5 Flash.">
+  <meta name="description" content="Transforms messy, panicked multilingual human inputs into structured, evidence-aware, prioritized operational actions powered by Google Gemini 2.5 Flash.">
   
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-      darkMode: 'class',
       theme: {
         extend: {
-          colors: {
-            slate: {
-              950: '#06090e',
-              900: '#0c1322',
-              850: '#111b2f',
-              800: '#18243c',
-              750: '#1e2d4d'
-            },
-            teal: {
-              300: '#5eead4',
-              400: '#2dd4bf',
-              500: '#14b8a6',
-              600: '#0d9488',
-              900: '#134e4a',
-              950: '#042f2e'
-            },
-            coral: {
-              500: '#f43f5e',
-              600: '#e11d48'
-            },
-            amber: {
-              400: '#fbbf24',
-              500: '#f59e0b',
-              600: '#d97706'
-            },
-            emerald: {
-              400: '#34d399',
-              500: '#10b981',
-              600: '#059669'
-            },
-            cyan: {
-              400: '#22d3ee',
-              500: '#06b6d4',
-              600: '#0891b2'
-            }
-          },
           fontFamily: {
             sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-            display: ['"Space Grotesk"', 'sans-serif'],
             mono: ['"JetBrains Mono"', 'monospace']
           }
         }
@@ -68,60 +30,49 @@
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <!-- Custom Styles -->
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=enterprise">
 </head>
-<body class="bg-[#06090e] text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-cyan-500 selection:text-black">
+<body class="text-slate-900 min-h-screen flex flex-col font-sans antialiased selection:bg-blue-100 selection:text-blue-900">
 
   <!-- Top System Header -->
-  <header class="sticky top-0 z-50 bg-[#0c1322]/90 backdrop-blur-md border-b border-slate-800/80 px-4 lg:px-8 py-3 transition-colors">
-    <div class="max-w-[1720px] mx-auto flex flex-wrap items-center justify-between gap-4">
+  <header class="sticky top-0 z-40 bg-white border-b border-[#DCE4EF] px-4 sm:px-6 py-2.5">
+    <div class="max-w-[1440px] mx-auto flex items-center justify-between gap-4">
       
       <!-- Brand & Tagline -->
       <div class="flex items-center gap-3">
-        <div class="h-10 w-10 rounded-lg bg-gradient-to-br from-cyan-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 ring-1 ring-cyan-400/40">
-          <i data-lucide="shield-alert" class="w-6 h-6 text-white stroke-[2.2]"></i>
+        <div class="h-8 w-8 rounded-md bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-xs">
+          <i data-lucide="shield" class="w-4 h-4 stroke-[2.2]"></i>
         </div>
-        <div>
-          <div class="flex items-center gap-2">
-            <span class="font-display font-bold text-xl tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-100 to-cyan-300">
-              SAARTHI AI
-            </span>
-            <span class="text-[10px] font-mono tracking-widest uppercase px-2 py-0.5 rounded bg-cyan-950/80 text-cyan-400 border border-cyan-800/60 font-semibold">
-              EOC v1.0
-            </span>
-            <span class="text-[10px] font-mono tracking-wider uppercase px-2 py-0.5 rounded bg-indigo-950/80 text-indigo-300 border border-indigo-800/60">
-              Gemini 2.5 Flash
-            </span>
-          </div>
-          <p class="text-xs text-slate-400 font-medium">
-            From human confusion to verified action • Emergency Intent-to-Action Engine
+        <div class="flex items-baseline gap-2.5">
+          <span class="font-bold text-slate-900 text-base tracking-tight">SAARTHI AI</span>
+          <span class="text-slate-300 hidden sm:inline">•</span>
+          <p class="text-xs text-slate-500 font-normal hidden sm:inline">
+            From human confusion to verified operational action
           </p>
         </div>
       </div>
 
-      <!-- Mode & Controls Bar -->
-      <div class="flex items-center flex-wrap gap-3">
-        <!-- Live vs Demo Mode Toggle -->
-        <div class="flex items-center bg-slate-900 border border-slate-800 rounded-lg p-1 text-xs font-mono shadow-inner">
-          <button id="mode-live-btn" type="button" class="px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-all text-slate-400 hover:text-white" title="Analyze with Google Gemini 2.5 Flash API">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+      <!-- Controls & Status Bar -->
+      <div class="flex items-center gap-2.5">
+        <!-- Live vs Demo Mode Segmented Control -->
+        <div class="flex items-center bg-slate-100 border border-slate-200 rounded-md p-0.5 text-xs">
+          <button id="mode-live-btn" type="button" class="px-2.5 py-1 rounded text-xs font-medium text-slate-600 hover:text-slate-900 transition-colors" title="Analyze with Google Gemini API">
             <span>Live Gemini</span>
           </button>
-          <button id="mode-demo-btn" type="button" class="px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-all bg-amber-500/20 text-amber-300 border border-amber-500/40 font-semibold" title="Explore offline deterministic hackathon presets">
-            <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+          <button id="mode-demo-btn" type="button" class="px-2.5 py-1 rounded text-xs font-medium bg-white text-slate-900 shadow-xs border border-slate-200 font-medium transition-colors" title="Explore offline deterministic hackathon presets">
             <span>Demo Mode</span>
           </button>
         </div>
 
         <!-- Connection / Health Status Pill -->
-        <div id="system-health-pill" class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-xs font-mono text-slate-300">
-          <span id="health-dot" class="w-2 h-2 rounded-full bg-emerald-400"></span>
+        <div id="system-health-pill" class="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-100 border border-slate-200 text-xs font-medium text-slate-700">
+          <span id="health-dot" class="w-2 h-2 rounded-full bg-teal-500"></span>
           <span id="health-label">System Ready</span>
         </div>
 
-        <!-- Reset / New Case -->
-        <button id="btn-new-case" type="button" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-xs font-semibold text-slate-200 transition-all hover:border-slate-500">
-          <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+        <!-- Reset / New Case Button -->
+        <button id="btn-new-case" type="button" class="flex items-center gap-1.5 px-3 py-1 rounded-md bg-white hover:bg-slate-50 border border-slate-300 text-xs font-medium text-slate-700 shadow-xs transition-colors">
+          <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 text-slate-500"></i>
           <span>New Case</span>
         </button>
       </div>
@@ -130,357 +81,490 @@
   </header>
 
   <!-- Persistent Demo Banner (Toggled when in Demo Mode) -->
-  <div id="demo-banner" class="bg-amber-950/70 border-b border-amber-800/60 px-4 py-2 text-center text-xs font-mono text-amber-300 flex items-center justify-center gap-2">
-    <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-400 shrink-0"></i>
-    <span><strong>DEMO MODE</strong> — Illustrative sample output. Not a live AI analysis or verified information.</span>
+  <div id="demo-banner" class="bg-amber-50 border-b border-amber-200 px-4 py-1.5 text-center text-xs text-amber-900 flex items-center justify-center gap-2">
+    <i data-lucide="info" class="w-3.5 h-3.5 text-amber-700 shrink-0"></i>
+    <span><strong>Demo Mode:</strong> Displaying illustrative sample output with deterministic presets. Not live AI execution.</span>
   </div>
 
   <!-- Real-time Live Error Banner -->
-  <div id="error-banner" class="hidden bg-rose-950/80 border-b border-rose-800 px-4 py-2 text-center text-xs font-mono text-rose-200 flex items-center justify-center gap-2">
-    <i data-lucide="alert-octagon" class="w-4 h-4 text-rose-400 shrink-0"></i>
+  <div id="error-banner" class="hidden bg-rose-50 border-b border-rose-200 px-4 py-1.5 text-center text-xs text-rose-900 flex items-center justify-center gap-2">
+    <i data-lucide="alert-circle" class="w-3.5 h-3.5 text-rose-600 shrink-0"></i>
     <span id="error-banner-text">Error communicating with server.</span>
-    <button id="error-switch-demo-btn" class="ml-2 underline font-semibold text-white hover:text-amber-300">Switch to Demo Mode</button>
+    <button id="error-switch-demo-btn" class="ml-2 underline font-semibold text-rose-900 hover:text-rose-700">Switch to Demo Mode</button>
   </div>
 
-  <!-- Main 3-Column Command Center Workspace -->
-  <main class="flex-1 max-w-[1720px] w-full mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-5" id="main-content">
+  <!-- Main Workspace (Clean 2-Column Responsive Flow: ~40% Input / ~60% Results) -->
+  <main class="flex-1 max-w-[1440px] w-full mx-auto p-4 sm:p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start" id="main-content">
     
     <!-- ========================================================================= -->
-    <!-- COLUMN 1: Human Input Hub (lg:col-span-4) -->
+    <!-- COLUMN 1: Input Workspace (lg:col-span-5 ~41%) -->
     <!-- ========================================================================= -->
-    <section class="lg:col-span-4 flex flex-col gap-4" aria-labelledby="input-hub-heading">
-      <div class="eoc-card rounded-xl p-5 flex flex-col gap-4 flex-1">
+    <section class="lg:col-span-5 flex flex-col gap-4" aria-labelledby="input-hub-heading">
+      <div class="eoc-card p-5 sm:p-6 flex flex-col gap-4">
         
-        <!-- Section Header -->
-        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
-          <div class="flex items-center gap-2">
-            <span class="flex h-6 w-6 items-center justify-center rounded bg-cyan-950 text-cyan-400 text-xs font-mono font-bold border border-cyan-800/80">01</span>
-            <h2 id="input-hub-heading" class="font-display font-semibold text-base text-slate-100 tracking-wide">
-              Human Input Hub
-            </h2>
-          </div>
-          <span class="text-[11px] font-mono text-slate-400">Distress Stream</span>
+        <!-- Header -->
+        <div class="pb-3 border-b border-slate-100">
+          <h2 id="input-hub-heading" class="text-base font-semibold text-slate-900 tracking-tight">
+            Turn complex situations into clear next steps.
+          </h2>
+          <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+            Decodes messy, panicked, or multilingual communication into verified facts, identified unknowns, and prioritized actions. <span class="sr-only">Human Input Hub</span>
+          </p>
+          <span id="model-badge" class="sr-only">gemini-3.1-flash-lite</span>
         </div>
 
-        <!-- Context Selector -->
+        <!-- Operational Context Selector -->
         <div class="flex flex-col gap-1.5">
-          <label for="context-select" class="text-xs font-semibold text-slate-300 flex items-center justify-between">
-            <span class="flex items-center gap-1.5">
-              <i data-lucide="compass" class="w-3.5 h-3.5 text-teal-400"></i>
-              <span>Operational Context</span>
-            </span>
-            <span class="text-[10px] text-teal-400 font-mono">Domain Triage Guidance</span>
+          <label for="context-select" class="text-xs font-medium text-slate-700 flex items-center justify-between">
+            <span>Operational context</span>
+            <span class="text-[11px] text-slate-400 font-normal">Auto-guided</span>
           </label>
-          <select id="context-select" class="bg-slate-900 border border-slate-700/80 rounded-lg px-3 py-1.5 text-xs text-slate-200 font-mono focus:outline-none focus:ring-1 focus:ring-teal-400 focus:border-teal-400 transition-all">
+          <select id="context-select" class="w-full bg-white border border-slate-300 rounded px-3 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-colors">
             <option value="auto">Auto-Detect Context (Recommended)</option>
-            <option value="community_safety">A. Community Safety & Severe Weather</option>
-            <option value="health_notes">B. Health Information & Symptoms</option>
-            <option value="public_service">C. Public Services & Benefits Navigation</option>
-            <option value="emergency_crisis">D. Emergency Distress & Critical Peril</option>
+            <option value="community_safety">Community Safety &amp; Severe Weather</option>
+            <option value="health_notes">Health Notes &amp; Clinical Information</option>
+            <option value="public_service">Public Services &amp; Benefits Navigation</option>
+            <option value="emergency_crisis">Emergency Distress &amp; Critical Peril</option>
           </select>
         </div>
 
-        <!-- Competition Sample Inputs / Presets Bar -->
+        <!-- Example Scenarios -->
         <div class="flex flex-col gap-2">
-          <span class="text-xs font-medium text-slate-400 flex items-center gap-1.5">
-            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-teal-400"></i>
-            Competition Demo Scenarios:
-          </span>
-          <div class="grid grid-cols-2 gap-2">
-            <button id="preset-community" type="button" class="preset-pill text-left p-2.5 rounded-lg bg-slate-900 hover:bg-slate-850 border border-slate-800 hover:border-teal-500/60 transition-all group">
-              <div class="flex items-center gap-1.5 text-[11px] font-bold text-teal-400 group-hover:text-teal-300">
-                <i data-lucide="cloud-rain" class="w-3 h-3"></i>
-                <span>A. Community Safety</span>
+          <span class="text-xs font-medium text-slate-500">Example scenarios:</span>
+          <div class="grid grid-cols-2 gap-2" id="preset-container">
+            <button id="preset-community" type="button" class="preset-pill text-left p-2.5 rounded-md bg-white hover:bg-blue-50/50 border border-[#DCE4EF] hover:border-blue-300 transition-all group shadow-2xs">
+              <div class="flex items-center gap-2 text-xs font-semibold text-slate-800 group-hover:text-blue-900">
+                <span class="w-5 h-5 rounded bg-blue-50 text-blue-600 border border-blue-200/60 flex items-center justify-center shrink-0">
+                  <i data-lucide="cloud-rain" class="w-3.5 h-3.5"></i>
+                </span>
+                <span>Community Safety</span>
               </div>
-              <p class="text-[10px] text-slate-400 truncate mt-0.5">Weather & road blockage</p>
+              <p class="text-[11px] text-slate-500 truncate mt-1">Storm &amp; road blockage</p>
             </button>
 
-            <button id="preset-health" type="button" class="preset-pill text-left p-2.5 rounded-lg bg-slate-900 hover:bg-slate-850 border border-slate-800 hover:border-teal-500/60 transition-all group">
-              <div class="flex items-center gap-1.5 text-[11px] font-bold text-teal-400 group-hover:text-teal-300">
-                <i data-lucide="stethoscope" class="w-3 h-3"></i>
-                <span>B. Health Notes</span>
+            <button id="preset-health" type="button" class="preset-pill text-left p-2.5 rounded-md bg-white hover:bg-teal-50/50 border border-[#DCE4EF] hover:border-teal-300 transition-all group shadow-2xs">
+              <div class="flex items-center gap-2 text-xs font-semibold text-slate-800 group-hover:text-teal-900">
+                <span class="w-5 h-5 rounded bg-teal-50 text-teal-700 border border-teal-200/60 flex items-center justify-center shrink-0">
+                  <i data-lucide="stethoscope" class="w-3.5 h-3.5"></i>
+                </span>
+                <span>Health Notes</span>
               </div>
-              <p class="text-[10px] text-slate-400 truncate mt-0.5">Symptoms & clinician prep</p>
+              <p class="text-[11px] text-slate-500 truncate mt-1">Symptoms &amp; clinician prep</p>
             </button>
 
-            <button id="preset-public" type="button" class="preset-pill text-left p-2.5 rounded-lg bg-slate-900 hover:bg-slate-850 border border-slate-800 hover:border-teal-500/60 transition-all group">
-              <div class="flex items-center gap-1.5 text-[11px] font-bold text-teal-400 group-hover:text-teal-300">
-                <i data-lucide="landmark" class="w-3 h-3"></i>
-                <span>C. Public Services</span>
+            <button id="preset-public" type="button" class="preset-pill text-left p-2.5 rounded-md bg-white hover:bg-indigo-50/50 border border-[#DCE4EF] hover:border-indigo-300 transition-all group shadow-2xs">
+              <div class="flex items-center gap-2 text-xs font-semibold text-slate-800 group-hover:text-indigo-900">
+                <span class="w-5 h-5 rounded bg-indigo-50 text-indigo-600 border border-indigo-200/60 flex items-center justify-center shrink-0">
+                  <i data-lucide="landmark" class="w-3.5 h-3.5"></i>
+                </span>
+                <span>Public Services</span>
               </div>
-              <p class="text-[10px] text-slate-400 truncate mt-0.5">Benefits & fee protection</p>
+              <p class="text-[11px] text-slate-500 truncate mt-1">Benefits &amp; fee protection</p>
             </button>
 
-            <button id="preset-medical" type="button" class="preset-pill text-left p-2.5 rounded-lg bg-slate-900 hover:bg-slate-850 border border-slate-800 hover:border-rose-500/60 transition-all group">
-              <div class="flex items-center gap-1.5 text-[11px] font-bold text-rose-400 group-hover:text-rose-300">
-                <i data-lucide="heart-pulse" class="w-3 h-3"></i>
-                <span>D. Emergency Triage</span>
+            <button id="preset-medical" type="button" class="preset-pill text-left p-2.5 rounded-md bg-white hover:bg-rose-50/50 border border-[#DCE4EF] hover:border-rose-300 transition-all group shadow-2xs">
+              <div class="flex items-center gap-2 text-xs font-semibold text-rose-700 group-hover:text-rose-900">
+                <span class="w-5 h-5 rounded bg-rose-50 text-rose-700 border border-rose-200/60 flex items-center justify-center shrink-0">
+                  <i data-lucide="heart-pulse" class="w-3.5 h-3.5"></i>
+                </span>
+                <span>Emergency Triage</span>
               </div>
-              <p class="text-[10px] text-slate-400 truncate mt-0.5">Cardiac & toll corridor</p>
+              <p class="text-[11px] text-slate-500 truncate mt-1">Chest pain &amp; toll corridor</p>
             </button>
           </div>
         </div>
 
-        <!-- Textarea with Live Speech and Character Count -->
-        <div class="flex flex-col gap-2">
-          <div class="flex items-center justify-between">
-            <label for="input-text" class="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-              <span>Field Communication / Incident Narrative</span>
-              <span class="text-[10px] font-normal text-slate-400">(English, हिन्दी, Hinglish)</span>
-            </label>
-            <span id="char-counter" class="text-[11px] font-mono text-slate-500">0 / 4000</span>
+        <!-- Narrative Textarea with Integrated Bottom Toolbar -->
+        <div class="flex flex-col border border-[#DCE4EF] rounded-md focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-600 transition-all bg-white overflow-hidden shadow-2xs">
+          <label for="input-text" class="sr-only">Field communication or situation narrative</label>
+          <textarea
+            id="input-text"
+            rows="5"
+            maxlength="4000"
+            placeholder="Paste a messy message, field notes, or distress communication in English, Hindi, or Hinglish..."
+            class="w-full bg-white border-0 p-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none resize-y min-h-[120px] max-h-[280px]"
+          ></textarea>
+
+          <!-- Integrated Attachment Preview (Compact Chip) -->
+          <div id="preview-container" class="hidden items-center justify-between px-3 py-2 bg-slate-50 border-t border-[#DCE4EF] text-xs">
+            <div class="flex items-center gap-2 min-w-0">
+              <div class="w-8 h-8 rounded border border-slate-200 overflow-hidden bg-white shrink-0 flex items-center justify-center">
+                <img id="image-preview" src="" alt="Upload thumbnail" class="max-h-full max-w-full object-cover">
+              </div>
+              <div class="min-w-0">
+                <p id="image-file-name" class="font-medium text-slate-800 truncate text-[11px] max-w-[180px]">image.png</p>
+                <p id="image-file-size" class="text-slate-400 text-[10px]">0 KB</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <button id="replace-image-btn" type="button" class="px-2 py-0.5 rounded bg-white hover:bg-slate-100 text-[11px] text-slate-700 border border-slate-200">Replace</button>
+              <button id="remove-image-btn" type="button" class="px-2 py-0.5 rounded bg-rose-50 hover:bg-rose-100 text-[11px] text-rose-700 border border-rose-200">Remove</button>
+            </div>
           </div>
 
-          <div class="relative">
-            <textarea
-              id="input-text"
-              rows="6"
-              maxlength="4000"
-              placeholder="Paste or speak panicked human input... (e.g. 'Arrey suno jaldi, pitaji ko chest me bohot dard ho raha hai, toll plaza ke paas phanse hain...')"
-              class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl p-3.5 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 transition-all font-sans resize-y min-h-[140px]"
-            ></textarea>
-          </div>
-
-          <!-- Web Speech API Controls -->
-          <div class="flex items-center justify-between gap-2 p-2 rounded-lg bg-slate-900/80 border border-slate-800">
+          <!-- Restrained Toolbar -->
+          <div class="flex items-center justify-between px-3 py-2 bg-slate-50/80 border-t border-[#DCE4EF] text-xs">
             <div class="flex items-center gap-2">
+              <!-- Voice Input Button -->
               <button
                 id="mic-btn"
                 type="button"
-                class="px-2.5 py-1.5 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center gap-1.5 text-xs font-medium border border-slate-700 transition-all"
+                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-medium text-xs shadow-2xs transition-colors"
                 title="Speak using Web Speech API"
               >
-                <i data-lucide="mic" id="mic-icon" class="w-3.5 h-3.5"></i>
-                <span id="mic-label">Voice Input</span>
+                <i data-lucide="mic" id="mic-icon" class="w-3.5 h-3.5 text-slate-500"></i>
+                <span id="mic-label">Voice</span>
               </button>
               <div id="speech-wave" class="hidden items-center gap-0.5">
                 <span class="w-1 h-3 bg-rose-500 rounded-full animate-bounce"></span>
-                <span class="w-1 h-5 bg-rose-400 rounded-full animate-bounce" style="animation-delay: 150ms"></span>
+                <span class="w-1 h-4 bg-rose-500 rounded-full animate-bounce" style="animation-delay: 150ms"></span>
                 <span class="w-1 h-2 bg-rose-500 rounded-full animate-bounce" style="animation-delay: 300ms"></span>
               </div>
-            </div>
 
-            <div class="flex items-center gap-1.5">
-              <label for="language-select" class="text-[11px] text-slate-400 font-mono">Lang:</label>
-              <select id="language-select" class="bg-slate-800 text-slate-200 border border-slate-700 text-xs rounded px-2 py-1 font-mono focus:outline-none focus:border-cyan-500">
-                <option value="en-IN">en-IN (English India)</option>
-                <option value="hi-IN">hi-IN (हिन्दी / Hinglish)</option>
+              <!-- Language Select -->
+              <select id="language-select" class="bg-transparent text-slate-600 hover:text-slate-900 border-0 text-xs py-0.5 px-1 focus:ring-0 cursor-pointer">
+                <option value="en-IN">en-IN</option>
+                <option value="hi-IN">hi-IN / Hinglish</option>
               </select>
+
+              <span class="text-slate-300">|</span>
+
+              <!-- Image Upload Trigger -->
+              <div id="drop-area" class="cursor-pointer">
+                <input type="file" id="image-input" accept="image/png,image/jpeg,image/webp" class="hidden">
+                <div id="drop-prompt" class="inline-flex items-center gap-1.5 px-2 py-1 rounded text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
+                  <i data-lucide="paperclip" class="w-3.5 h-3.5 text-slate-400"></i>
+                  <span>Attach image</span>
+                </div>
+              </div>
             </div>
+
+            <!-- Character Counter -->
+            <span id="char-counter" class="text-[11px] font-mono text-slate-400">0 / 4000</span>
           </div>
-          <p id="speech-status" class="text-[11px] text-slate-400 italic hidden"></p>
         </div>
-
-        <!-- Multimodal Image Upload (PNG, JPEG, WEBP <= 4 MB) -->
-        <div class="flex flex-col gap-2">
-          <div class="flex items-center justify-between">
-            <label class="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-              <i data-lucide="camera" class="w-3.5 h-3.5 text-cyan-400"></i>
-              <span>Scene Photo / Document Upload</span>
-            </label>
-            <span class="text-[10px] font-mono text-slate-500">PNG, JPEG, WEBP ≤ 4MB</span>
-          </div>
-
-          <!-- Drop Area -->
-          <div
-            id="drop-area"
-            class="border-2 border-dashed border-slate-800 hover:border-cyan-500/50 rounded-xl p-4 text-center cursor-pointer transition-all bg-slate-900/40 hover:bg-slate-900/80 group"
-          >
-            <input type="file" id="image-input" accept="image/png,image/jpeg,image/webp" class="hidden">
-            
-            <div id="drop-prompt" class="flex flex-col items-center gap-1.5">
-              <i data-lucide="upload-cloud" class="w-6 h-6 text-slate-500 group-hover:text-cyan-400 transition-colors"></i>
-              <p class="text-xs text-slate-300 font-medium">
-                Drag and drop image or <span class="text-cyan-400 underline">browse</span>
-              </p>
-              <p class="text-[10px] text-slate-500">Camera snapshots, road conditions, prescriptions</p>
-            </div>
-
-            <!-- Preview Card -->
-            <div id="preview-container" class="hidden flex-col items-center gap-2">
-              <div class="relative w-full max-h-48 overflow-hidden rounded-lg border border-slate-700 bg-slate-950 flex items-center justify-center">
-                <img id="image-preview" src="" alt="Incident upload preview" class="max-h-44 object-contain rounded">
-              </div>
-              <div class="flex items-center justify-between w-full text-xs font-mono text-slate-400">
-                <span id="image-file-name" class="truncate max-w-[200px]">image.png</span>
-                <span id="image-file-size">0 KB</span>
-              </div>
-              <div class="flex items-center gap-2 w-full pt-1">
-                <button id="replace-image-btn" type="button" class="flex-1 py-1 px-2 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-300 border border-slate-700">Replace</button>
-                <button id="remove-image-btn" type="button" class="py-1 px-2 rounded bg-rose-950/60 hover:bg-rose-900/60 text-rose-300 text-[11px] border border-rose-800">Remove</button>
-              </div>
-            </div>
-          </div>
-          <p class="text-[10px] text-slate-500">Note: Audio recordings and PDF files are not directly processed. Transcribe audio using the microphone above.</p>
-        </div>
+        <p id="speech-status" class="text-[11px] text-slate-500 italic hidden"></p>
 
         <!-- Primary Call to Action Button -->
-        <div class="pt-2 mt-auto">
-          <button
-            id="btn-analyze"
-            type="button"
-            class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-cyan-500 via-indigo-600 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-white font-display font-bold text-sm tracking-wide shadow-lg shadow-indigo-900/40 hover:shadow-cyan-500/25 active:scale-[0.99] transition-all flex items-center justify-center gap-2"
-          >
-            <i data-lucide="play-circle" class="w-4 h-4"></i>
-            <span>Turn This Into a Plan</span>
-          </button>
-        </div>
+        <button
+          id="btn-analyze"
+          type="button"
+          class="w-full py-2.5 px-4 rounded-md bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium text-sm shadow-xs transition-colors flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
+        >
+          <i data-lucide="play" class="w-4 h-4 fill-current"></i>
+          <span>Analyze situation</span>
+        </button>
 
       </div>
     </section>
 
     <!-- ========================================================================= -->
-    <!-- COLUMN 2: Gemini Intent Bridge (lg:col-span-4) -->
+    <!-- COLUMN 2: Analysis Results Workspace (lg:col-span-7 ~59%) -->
     <!-- ========================================================================= -->
-    <section class="lg:col-span-4 flex flex-col gap-4" aria-labelledby="intent-bridge-heading">
-      <div class="eoc-card rounded-xl p-5 flex flex-col gap-4 flex-1">
-        
+    <section class="lg:col-span-7 flex flex-col gap-4" aria-labelledby="intent-bridge-heading">
+      <h2 id="intent-bridge-heading" class="sr-only">Analysis Results Workspace</h2>
+      <h2 id="action-workspace-heading" class="sr-only">Structured Action Directives</h2>
+
+      <!-- Empty State: 3-Step Workflow & Quick-Start Interactive Prompts -->
+      <div id="bridge-empty-state" class="eoc-card p-6 sm:p-7 flex flex-col gap-5 border border-[#DCE4EF] bg-white">
         <!-- Header -->
-        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
-          <div class="flex items-center gap-2">
-            <span class="flex h-6 w-6 items-center justify-center rounded bg-indigo-950 text-indigo-400 text-xs font-mono font-bold border border-indigo-800/80">02</span>
-            <h2 id="intent-bridge-heading" class="font-display font-semibold text-base text-slate-100 tracking-wide">
-              Gemini Intent Bridge
-            </h2>
+        <div class="space-y-1">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-semibold text-slate-900 flex items-center gap-2">
+              <span class="inline-flex items-center justify-center w-5 h-5 rounded bg-blue-50 text-blue-600 border border-blue-200/50 text-xs font-semibold">⚡</span>
+              Operational Decision Workspace
+            </h3>
+            <span class="text-[11px] font-mono text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-[#DCE4EF]">AWAITING INPUT</span>
           </div>
-          <span id="case-badge" class="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-900 text-slate-400 border border-slate-800">CASE #READY</span>
+          <p class="text-xs text-slate-500 leading-relaxed">
+            Enter field notes on the left or click a quick-start scenario below. SAARTHI AI correlates facts, isolates unknowns, and drafts prioritized execution steps.
+          </p>
         </div>
 
-        <!-- Empty State Placeholder -->
-        <div id="bridge-empty-state" class="flex flex-col items-center justify-center py-16 text-center text-slate-500 gap-3 my-auto">
-          <div class="w-12 h-12 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center">
-            <i data-lucide="cpu" class="w-6 h-6 text-slate-600"></i>
+        <!-- Compact Blue/Teal Workflow Visual Bar -->
+        <div class="hidden sm:flex items-center justify-between px-3 py-2 rounded-md bg-gradient-to-r from-blue-50/80 via-teal-50/60 to-indigo-50/80 border border-[#DCE4EF] text-[11px] text-slate-600">
+          <div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-blue-600"></span>
+            <span class="font-medium text-slate-700">1. Multilingual Ingestion</span>
           </div>
-          <div>
-            <p class="text-sm font-semibold text-slate-400">Analysis Engine Idle</p>
-            <p class="text-xs text-slate-600 max-w-xs mt-1">Select a preset or enter distress details in Column 1 and click "Turn This Into a Plan".</p>
+          <span class="text-slate-400 font-mono">&rarr;</span>
+          <div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-teal-600"></span>
+            <span class="font-medium text-slate-700">2. Gemini Evidence Check</span>
+          </div>
+          <span class="text-slate-400 font-mono">&rarr;</span>
+          <div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
+            <span class="font-medium text-slate-700">3. Operational Action Directives</span>
           </div>
         </div>
 
-        <!-- Loading State Skeleton -->
-        <div id="bridge-loading-state" class="hidden flex-col gap-4 py-8 animate-pulse">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-full bg-slate-800"></div>
-            <div class="flex-1 space-y-2">
-              <div class="h-3 bg-slate-800 rounded w-1/3"></div>
-              <div class="h-2 bg-slate-850 rounded w-2/3"></div>
+        <!-- 3-Step Analysis Pipeline Visual with Restrained Blue, Teal, and Indigo Accents -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <!-- Step 1: Blue Accent -->
+          <div class="workflow-step-blue p-3.5 rounded-md space-y-1.5">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1.5 text-xs font-semibold text-blue-950">
+                <span class="w-5 h-5 rounded bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+                  <i data-lucide="compass" class="w-3.5 h-3.5"></i>
+                </span>
+                <span>1. Understand Intent</span>
+              </div>
+              <span class="text-[10px] font-mono text-blue-700 bg-blue-100/70 px-1.5 py-0.5 rounded font-semibold">STAGE 01</span>
             </div>
+            <p class="text-[11px] text-slate-600 leading-snug">
+              Extracts true operational goals &amp; urgency from multilingual distress reports.
+            </p>
           </div>
-          <div class="h-20 bg-slate-900 rounded-xl"></div>
-          <div class="h-28 bg-slate-900 rounded-xl"></div>
-          <div class="h-24 bg-slate-900 rounded-xl"></div>
-          <p class="text-center text-xs font-mono text-cyan-400 tracking-wider">Decoding human intent & grounding claims...</p>
+
+          <!-- Step 2: Teal Accent -->
+          <div class="workflow-step-teal p-3.5 rounded-md space-y-1.5">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1.5 text-xs font-semibold text-teal-950">
+                <span class="w-5 h-5 rounded bg-teal-100 text-teal-700 flex items-center justify-center shrink-0">
+                  <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                </span>
+                <span>2. Check Evidence</span>
+              </div>
+              <span class="text-[10px] font-mono text-teal-800 bg-teal-100/70 px-1.5 py-0.5 rounded font-semibold">STAGE 02</span>
+            </div>
+            <p class="text-[11px] text-slate-600 leading-snug">
+              Cross-checks claims against external grounding and flags unverified rumors.
+            </p>
+          </div>
+
+          <!-- Step 3: Indigo Accent -->
+          <div class="workflow-step-indigo p-3.5 rounded-md space-y-1.5">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1.5 text-xs font-semibold text-indigo-950">
+                <span class="w-5 h-5 rounded bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0">
+                  <i data-lucide="list-ordered" class="w-3.5 h-3.5"></i>
+                </span>
+                <span>3. Prioritize Action</span>
+              </div>
+              <span class="text-[10px] font-mono text-indigo-800 bg-indigo-100/70 px-1.5 py-0.5 rounded font-semibold">STAGE 03</span>
+            </div>
+            <p class="text-[11px] text-slate-600 leading-snug">
+              Generates numbered on-scene guidance and draft dispatch payloads for approval.
+            </p>
+          </div>
         </div>
 
-        <!-- Populated State Content -->
-        <div id="bridge-content" class="hidden flex-col gap-4">
-          
-          <!-- Urgency & Domain Pill Bar -->
-          <div class="flex items-center justify-between gap-2 flex-wrap">
+        <!-- Quick-Start Prompts -->
+        <div class="space-y-2 pt-2 border-t border-[#DCE4EF]">
+          <span class="text-xs font-medium text-slate-700">Quick-start operational examples (click to load):</span>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <button
+              id="empty-preset-community"
+              type="button"
+              class="text-left p-3 rounded-md bg-white hover:bg-blue-50/40 border border-[#DCE4EF] hover:border-blue-300 transition-all group shadow-2xs"
+            >
+              <div class="flex items-center justify-between text-xs font-semibold text-slate-900 group-hover:text-blue-900">
+                <span class="flex items-center gap-2">
+                  <span class="w-5 h-5 rounded bg-blue-50 text-blue-600 border border-blue-200/60 flex items-center justify-center shrink-0">
+                    <i data-lucide="cloud-rain" class="w-3.5 h-3.5"></i>
+                  </span>
+                  <span>Community Safety &amp; Flood</span>
+                </span>
+                <span class="text-[11px] text-blue-600 opacity-80 group-hover:opacity-100 font-normal">Load &rarr;</span>
+              </div>
+              <p class="text-[11px] text-slate-500 line-clamp-2 mt-1.5">
+                "Red alert in Sector 14–18 belt! Main underpass flooded with 4ft water, fallen tree crushed streetlight..."
+              </p>
+            </button>
+
+            <button
+              id="empty-preset-health"
+              type="button"
+              class="text-left p-3 rounded-md bg-white hover:bg-teal-50/40 border border-[#DCE4EF] hover:border-teal-300 transition-all group shadow-2xs"
+            >
+              <div class="flex items-center justify-between text-xs font-semibold text-slate-900 group-hover:text-teal-900">
+                <span class="flex items-center gap-2">
+                  <span class="w-5 h-5 rounded bg-teal-50 text-teal-700 border border-teal-200/60 flex items-center justify-center shrink-0">
+                    <i data-lucide="stethoscope" class="w-3.5 h-3.5"></i>
+                  </span>
+                  <span>Health Notes &amp; Symptoms</span>
+                </span>
+                <span class="text-[11px] text-teal-700 opacity-80 group-hover:opacity-100 font-normal">Load &rarr;</span>
+              </div>
+              <p class="text-[11px] text-slate-500 line-clamp-2 mt-1.5">
+                "Elderly mother reporting persistent fatigue, type 2 diabetic on metformin, started OTC ibuprofen..."
+              </p>
+            </button>
+          </div>
+        </div>
+
+        <!-- Transparent Evidence & Safety Boundary Note -->
+        <div class="p-3 rounded-md bg-slate-50 border border-[#DCE4EF] text-xs text-slate-600 flex items-start gap-2.5">
+          <i data-lucide="info" class="w-4 h-4 text-slate-400 shrink-0 mt-0.5"></i>
+          <p class="text-[11px] leading-relaxed">
+            <span class="font-semibold text-slate-700">Honest Grounding &amp; Safety Policy:</span> Sample scenarios are decision-support demonstrations, not real-time emergency dispatches. Statements lacking authoritative external citations are explicitly marked <em>Not independently verified</em>. Critical medical or disaster markers trigger deterministic safety protocols.
+          </p>
+        </div>
+      </div>
+      <div id="action-empty-state" class="hidden"></div>
+
+      <!-- Loading State Skeleton -->
+      <div id="bridge-loading-state" class="hidden eoc-card p-6 flex-col gap-4 animate-pulse">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-full bg-slate-200"></div>
+          <div class="flex-1 space-y-2">
+            <div class="h-3 bg-slate-200 rounded w-1/4"></div>
+            <div class="h-2 bg-slate-100 rounded w-1/2"></div>
+          </div>
+        </div>
+        <div class="h-20 bg-slate-100 rounded-md"></div>
+        <div class="h-28 bg-slate-100 rounded-md"></div>
+        <p class="text-center text-xs font-medium text-slate-500">Analyzing situation and verifying claims...</p>
+      </div>
+      <div id="action-loading-state" class="hidden"></div>
+
+      <!-- Populated State: Section 1 (Situation Assessment & Intent) -->
+      <div id="bridge-content" class="hidden flex-col gap-4">
+        <!-- Situation Card -->
+        <div class="eoc-card p-5 sm:p-6 space-y-4">
+          <!-- Top Row: Badges & Confidence -->
+          <div class="flex items-center justify-between gap-2 flex-wrap pb-3 border-b border-slate-100">
             <div class="flex items-center gap-2">
-              <span id="urgency-badge" class="px-2.5 py-1 rounded text-xs font-mono font-bold uppercase tracking-wider bg-rose-500/20 text-rose-300 border border-rose-500/40">
+              <span id="urgency-badge" class="px-2.5 py-1 rounded text-xs font-mono font-bold uppercase tracking-wider badge-immediate">
                 IMMEDIATE
               </span>
-              <span id="domain-badge" class="px-2.5 py-1 rounded text-xs font-mono font-semibold uppercase tracking-wider bg-slate-800 text-slate-300 border border-slate-700">
+              <span id="domain-badge" class="px-2 py-0.5 rounded text-xs font-mono font-medium uppercase bg-slate-100 text-slate-700 border border-slate-200">
                 MEDICAL
               </span>
+              <span id="case-badge" class="text-xs font-mono text-slate-400 ml-1">CASE #READY</span>
             </div>
 
-            <!-- Confidence Gauge -->
-            <div class="flex items-center gap-1.5 text-xs font-mono" title="Statistical estimate generated by Gemini 2.5 Flash">
-              <span class="text-slate-400 text-[10px]">Model Confidence:</span>
-              <span id="confidence-val" class="font-bold text-cyan-400">96%</span>
-              <div class="w-12 h-2 bg-slate-800 rounded-full overflow-hidden">
-                <div id="confidence-bar" class="h-full bg-cyan-400" style="width: 96%"></div>
+            <!-- Confidence Rating -->
+            <div class="flex items-center gap-2 text-xs" title="Statistical estimate generated by Gemini 2.5 Flash">
+              <span class="text-slate-500 text-xs">Confidence:</span>
+              <span id="confidence-val" class="font-semibold text-slate-800">96%</span>
+              <div class="w-14 h-1.5 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
+                <div id="confidence-bar" class="h-full bg-blue-600 rounded-full" style="width: 96%"></div>
               </div>
             </div>
           </div>
 
-          <!-- Title -->
+          <!-- Title & Summary -->
           <div>
-            <h3 id="plan-title" class="font-display font-bold text-sm text-white leading-snug">
+            <h3 id="plan-title" class="font-bold text-base text-slate-900 leading-snug">
               Action Plan Title
             </h3>
-            <p id="plan-summary" class="text-xs text-slate-300 mt-1.5 leading-relaxed bg-slate-900/60 p-2.5 rounded-lg border border-slate-800/80">
+            <p id="plan-summary" class="text-xs text-slate-600 mt-1.5 leading-relaxed bg-slate-50 p-3 rounded-md border border-slate-200">
               Plain-language summary of situational context.
             </p>
           </div>
 
-          <!-- Intent Contrast Box -->
-          <div class="rounded-lg bg-slate-900 border border-slate-800 p-3 space-y-2 text-xs">
+          <!-- Single Most Useful Next Step (Hero Recommendation) -->
+          <div id="hero-action-card" class="rounded-md bg-blue-50/70 border border-blue-200 p-3.5 space-y-1.5 shadow-2xs">
+            <div class="flex items-center justify-between gap-2 flex-wrap">
+              <div class="flex items-center gap-1.5 text-xs font-semibold text-blue-900 uppercase tracking-wider">
+                <span class="flex h-2 w-2 rounded-full bg-blue-600 animate-pulse"></span>
+                <i data-lucide="zap" class="w-3.5 h-3.5 text-blue-600"></i>
+                <span>Primary Recommended Next Step</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span id="hero-action-timing" class="text-[11px] font-mono font-medium px-2 py-0.5 rounded bg-blue-100 text-blue-800 border border-blue-200">Immediate</span>
+                <span class="text-[10px] font-medium px-1.5 py-0.5 rounded bg-white text-slate-600 border border-slate-200">Human Approval Required</span>
+              </div>
+            </div>
+            <p id="hero-action-step" class="text-sm font-semibold text-slate-900 leading-snug">...</p>
+            <p id="hero-action-why" class="text-xs text-slate-600 leading-relaxed">...</p>
+          </div>
+
+          <!-- Decoded Intent Box -->
+          <div class="rounded-md bg-slate-50 border border-slate-200 p-3 space-y-2 text-xs">
             <div>
-              <span class="text-[10px] font-mono uppercase text-slate-500 font-semibold tracking-wider">What the Person Said:</span>
-              <p id="intent-said" class="text-slate-300 italic mt-0.5 pl-2 border-l-2 border-slate-700">"..."</p>
+              <span class="text-[11px] uppercase text-slate-500 font-semibold tracking-wide">What was communicated:</span>
+              <p id="intent-said" class="text-slate-600 italic mt-0.5 pl-2.5 border-l-2 border-slate-300">"..."</p>
             </div>
             <div>
-              <span class="text-[10px] font-mono uppercase text-cyan-400 font-semibold tracking-wider flex items-center gap-1">
-                <i data-lucide="target" class="w-3 h-3"></i> Decoded Underlying Intent:
+              <span class="text-[11px] uppercase text-blue-700 font-semibold tracking-wide flex items-center gap-1">
+                <i data-lucide="target" class="w-3 h-3 text-blue-600"></i> Decoded operational intent:
               </span>
-              <p id="intent-true" class="text-cyan-200 font-medium mt-0.5 pl-2 border-l-2 border-cyan-500">...</p>
+              <p id="intent-true" class="text-slate-900 font-medium mt-0.5 pl-2.5 border-l-2 border-blue-500">...</p>
             </div>
           </div>
 
-          <!-- Extracted Entities Grid -->
-          <div class="space-y-1.5">
-            <span class="text-[11px] font-mono uppercase text-slate-400 tracking-wider font-semibold">Extracted Entities & Context</span>
+          <!-- Immediate Physical Guidance (On-Scene Steps) -->
+          <div class="rounded-md bg-slate-50 border border-slate-200 p-3.5 space-y-2">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1.5">
+                <i data-lucide="shield-alert" class="w-4 h-4 text-slate-700"></i>
+                <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-800">
+                  Immediate Physical Guidance (On-Scene)
+                </h3>
+              </div>
+              <span class="text-[11px] font-mono text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200 font-medium">PRIORITY STEPS</span>
+            </div>
+            <ol id="human-guidance-list" class="space-y-2 text-xs text-slate-800">
+              <!-- Guidance steps injected here by ui.js -->
+            </ol>
+          </div>
+
+          <!-- Extracted Entities -->
+          <div class="space-y-1.5 pt-1">
+            <span class="text-xs font-semibold text-slate-700">Identified Entities &amp; Context</span>
             <div class="grid grid-cols-2 gap-2 text-xs">
-              <div class="p-2 rounded bg-slate-900/90 border border-slate-800">
-                <span class="text-[10px] font-mono text-slate-400 block">Primary Issue</span>
-                <span id="entity-primary" class="font-medium text-slate-200 text-[11px]">...</span>
+              <div class="p-2.5 rounded bg-slate-50 border border-slate-200">
+                <span class="text-[11px] text-slate-500 block">Primary Issue</span>
+                <span id="entity-primary" class="font-medium text-slate-900 text-xs">...</span>
               </div>
-              <div class="p-2 rounded bg-slate-900/90 border border-slate-800">
-                <span class="text-[10px] font-mono text-slate-400 block">Location Clues</span>
-                <span id="entity-location" class="font-medium text-slate-200 text-[11px]">...</span>
+              <div class="p-2.5 rounded bg-slate-50 border border-slate-200">
+                <span class="text-[11px] text-slate-500 block">Location Context</span>
+                <span id="entity-location" class="font-medium text-slate-900 text-xs">...</span>
               </div>
-              <div class="p-2 rounded bg-slate-900/90 border border-slate-800 col-span-2">
-                <span class="text-[10px] font-mono text-slate-400 block">Identified Symptoms</span>
+              <div class="p-2.5 rounded bg-slate-50 border border-slate-200 col-span-2">
+                <span class="text-[11px] text-slate-500 block">Identified Symptoms</span>
                 <div id="entity-symptoms" class="flex flex-wrap gap-1 mt-1"></div>
               </div>
-              <div class="p-2 rounded bg-slate-900/90 border border-slate-800 col-span-2">
-                <span class="text-[10px] font-mono text-slate-400 block">History & Medications</span>
+              <div class="p-2.5 rounded bg-slate-50 border border-slate-200 col-span-2">
+                <span class="text-[11px] text-slate-500 block">History &amp; Medications</span>
                 <div id="entity-history" class="flex flex-wrap gap-1 mt-1"></div>
               </div>
-              <div class="p-2 rounded bg-slate-900/90 border border-slate-800 col-span-2">
-                <span class="text-[10px] font-mono text-rose-400 block font-semibold">Detected Risks</span>
+              <div class="p-2.5 rounded bg-slate-50 border border-slate-200 col-span-2">
+                <span class="text-[11px] text-rose-700 block font-semibold">Detected Risks</span>
                 <div id="entity-risks" class="flex flex-wrap gap-1 mt-1"></div>
               </div>
             </div>
           </div>
 
-          <!-- Facts / Unknowns / Conflicts Accordion -->
-          <div class="space-y-2 text-xs">
-            <!-- Known Facts -->
-            <div class="rounded-lg bg-slate-900/80 border border-slate-800 p-2.5">
-              <span class="text-[10px] font-mono uppercase text-emerald-400 font-semibold tracking-wider flex items-center gap-1">
-                <i data-lucide="check-circle-2" class="w-3 h-3"></i> Known Facts (<span id="facts-count">0</span>)
-              </span>
-              <ul id="facts-list" class="mt-1.5 space-y-1 text-slate-300 pl-4 list-disc marker:text-emerald-500"></ul>
+          <!-- Facts, Unknowns, and Conflicts Subgrid -->
+          <div class="space-y-2 pt-2 border-t border-slate-100">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+              <!-- Known Facts -->
+              <div class="rounded-md bg-slate-50 border border-slate-200 p-3">
+                <span class="text-xs font-semibold text-emerald-800 flex items-center gap-1.5">
+                  <i data-lucide="check-circle" class="w-3.5 h-3.5 text-emerald-600"></i> Known Facts (<span id="facts-count">0</span>)
+                </span>
+                <ul id="facts-list" class="mt-2 space-y-1 text-slate-700 pl-4 list-disc marker:text-emerald-600"></ul>
+              </div>
+
+              <!-- Unknowns / Missing Info -->
+              <div class="rounded-md bg-slate-50 border border-slate-200 p-3">
+                <span class="text-xs font-semibold text-amber-800 flex items-center gap-1.5">
+                  <i data-lucide="help-circle" class="w-3.5 h-3.5 text-amber-600"></i> Unknowns &amp; Missing Data (<span id="unknowns-count">0</span>)
+                </span>
+                <ul id="unknowns-list" class="mt-2 space-y-1 text-slate-700 pl-4 list-disc marker:text-amber-600"></ul>
+              </div>
             </div>
 
-            <!-- Unknowns / Missing Info -->
-            <div class="rounded-lg bg-slate-900/80 border border-slate-800 p-2.5">
-              <span class="text-[10px] font-mono uppercase text-amber-400 font-semibold tracking-wider flex items-center gap-1">
-                <i data-lucide="help-circle" class="w-3 h-3"></i> Unknowns & Missing Data (<span id="unknowns-count">0</span>)
+            <!-- Contradictions / Conflicts -->
+            <div id="conflicts-container" class="rounded-md bg-rose-50 border border-rose-200 p-3 text-xs">
+              <span class="text-xs font-semibold text-rose-800 flex items-center gap-1.5">
+                <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-rose-600"></i> Contradictions &amp; Conflicts
               </span>
-              <ul id="unknowns-list" class="mt-1.5 space-y-1 text-slate-300 pl-4 list-disc marker:text-amber-500"></ul>
-            </div>
-
-            <!-- Contradictions -->
-            <div id="conflicts-container" class="rounded-lg bg-slate-900/80 border border-slate-800 p-2.5">
-              <span class="text-[10px] font-mono uppercase text-rose-400 font-semibold tracking-wider flex items-center gap-1">
-                <i data-lucide="split" class="w-3 h-3"></i> Contradictions & Conflicts
-              </span>
-              <ul id="conflicts-list" class="mt-1.5 space-y-1 text-slate-300 pl-4 list-disc marker:text-rose-500"></ul>
+              <ul id="conflicts-list" class="mt-1.5 space-y-1 text-rose-900 pl-4 list-disc marker:text-rose-600"></ul>
             </div>
           </div>
 
           <!-- Evidence Verification Section -->
-          <div class="space-y-2 pt-2 border-t border-slate-800 text-xs">
+          <div class="space-y-2 pt-2 border-t border-slate-100 text-xs">
             <div class="flex items-center justify-between">
-              <span class="text-[11px] font-mono uppercase text-cyan-400 tracking-wider font-semibold flex items-center gap-1">
-                <i data-lucide="file-check" class="w-3.5 h-3.5"></i> Evidence & Grounding Verification
+              <span class="text-xs font-semibold text-slate-800 flex items-center gap-1.5">
+                <i data-lucide="file-check" class="w-3.5 h-3.5 text-blue-600"></i> Evidence &amp; Grounding Verification
               </span>
-              <span class="text-[10px] text-slate-500 font-mono">Google Search Grounding</span>
+              <span class="text-[11px] text-slate-400 font-normal">Independent Evidence Correlation</span>
             </div>
             
             <div id="verification-list" class="space-y-2">
@@ -491,68 +575,22 @@
         </div>
 
       </div>
-    </section>
 
-    <!-- ========================================================================= -->
-    <!-- COLUMN 3: Structured Action Workspace (lg:col-span-4) -->
-    <!-- ========================================================================= -->
-    <section class="lg:col-span-4 flex flex-col gap-4" aria-labelledby="action-workspace-heading">
-      <div class="eoc-card rounded-xl p-5 flex flex-col gap-4 flex-1">
-        
-        <!-- Header -->
-        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
-          <div class="flex items-center gap-2">
-            <span class="flex h-6 w-6 items-center justify-center rounded bg-emerald-950 text-emerald-400 text-xs font-mono font-bold border border-emerald-800/80">03</span>
-            <h2 id="action-workspace-heading" class="font-display font-semibold text-base text-slate-100 tracking-wide">
-              Structured Action Workspace
-            </h2>
-          </div>
-          <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-950/60 text-emerald-400 border border-emerald-800/60 font-semibold">
-            Executable Directives
-          </span>
-        </div>
+      <!-- Populated State: Section 2 (Actions, Guidance & Directives) -->
+      <div id="action-content" class="hidden flex-col gap-4">
 
-        <!-- Empty State Placeholder -->
-        <div id="action-empty-state" class="flex flex-col items-center justify-center py-16 text-center text-slate-500 gap-3 my-auto">
-          <div class="w-12 h-12 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center">
-            <i data-lucide="layers" class="w-6 h-6 text-slate-600"></i>
-          </div>
-          <div>
-            <p class="text-sm font-semibold text-slate-400">Action Matrix Pending</p>
-            <p class="text-xs text-slate-600 max-w-xs mt-1">Structured system actions, draft dispatch payloads, and simulations will appear here once synthesized.</p>
-          </div>
-        </div>
-
-        <!-- Loading State Skeleton -->
-        <div id="action-loading-state" class="hidden flex-col gap-4 py-8 animate-pulse">
-          <div class="h-24 bg-slate-900 rounded-xl"></div>
-          <div class="h-28 bg-slate-900 rounded-xl"></div>
-          <div class="h-32 bg-slate-900 rounded-xl"></div>
-          <p class="text-center text-xs font-mono text-emerald-400 tracking-wider">Formatting system payloads & triage priorities...</p>
-        </div>
-
-        <!-- Populated State Content -->
-        <div id="action-content" class="hidden flex-col gap-4">
-
-          <!-- Immediate Human Guidance (3 Key Physical Steps) -->
-          <div class="rounded-xl bg-gradient-to-br from-emerald-950/40 via-slate-900 to-cyan-950/30 border border-emerald-800/60 p-3.5 space-y-2">
-            <div class="flex items-center gap-1.5">
-              <i data-lucide="life-buoy" class="w-4 h-4 text-emerald-400"></i>
-              <h3 class="text-xs font-display font-bold uppercase tracking-wider text-emerald-300">
-                Immediate Physical Guidance (On-Scene)
-              </h3>
-            </div>
-            <ol id="human-guidance-list" class="space-y-2 text-xs text-slate-200">
-              <!-- Guidance steps injected here -->
-            </ol>
-          </div>
+        <div class="eoc-card p-5 sm:p-6 space-y-4">
 
           <!-- Structured Action Directives Cards -->
-          <div class="space-y-2">
-            <span class="text-[11px] font-mono uppercase text-slate-400 tracking-wider font-semibold flex items-center justify-between">
-              <span>Target System Action Directives</span>
-              <span class="text-[10px] text-amber-400">Human Approval Required</span>
-            </span>
+          <div class="space-y-2.5">
+            <div class="flex items-center justify-between">
+              <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-700">
+                Target System Action Directives
+              </h3>
+              <span class="text-[11px] font-medium text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                Human Approval Required
+              </span>
+            </div>
 
             <div id="actions-list" class="space-y-2.5">
               <!-- Action cards inserted by ui.js -->
@@ -560,98 +598,98 @@
           </div>
 
           <!-- Critical Follow-up Question -->
-          <div id="follow-up-card" class="rounded-lg bg-amber-950/40 border border-amber-800/80 p-3 space-y-1">
-            <span class="text-[10px] font-mono uppercase text-amber-400 font-bold tracking-wider flex items-center gap-1">
-              <i data-lucide="help-circle" class="w-3.5 h-3.5"></i> Critical Information Needed
+          <div id="follow-up-card" class="rounded-md bg-amber-50 border border-amber-200 p-3 space-y-1">
+            <span class="text-xs font-semibold text-amber-900 flex items-center gap-1">
+              <i data-lucide="help-circle" class="w-3.5 h-3.5 text-amber-600"></i> Critical Information Needed
             </span>
-            <p id="follow-up-text" class="text-xs text-amber-200 font-medium">...</p>
+            <p id="follow-up-text" class="text-xs text-amber-800 font-medium">...</p>
           </div>
 
-          <!-- Simulation & Copy Buttons Toolbar -->
-          <div class="flex items-center gap-2 flex-wrap pt-2 border-t border-slate-800">
+          <!-- Action Toolbar -->
+          <div class="flex items-center gap-2 flex-wrap pt-3 border-t border-slate-100">
             <button
               id="btn-simulate"
               type="button"
-              class="flex-1 py-2 px-3 rounded-lg bg-teal-600 hover:bg-teal-500 text-white font-mono text-xs font-semibold flex items-center justify-center gap-1.5 shadow transition-all"
+              class="flex-1 py-1.5 px-3 rounded-md bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium flex items-center justify-center gap-1.5 shadow-xs transition-colors"
             >
-              <i data-lucide="terminal" class="w-3.5 h-3.5"></i>
-              <span>Simulate</span>
+              <i data-lucide="play" class="w-3.5 h-3.5"></i>
+              <span>Simulate Dispatch</span>
             </button>
 
             <button
               id="btn-copy-plan"
               type="button"
-              class="py-2 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-mono text-xs font-medium border border-slate-700 flex items-center gap-1 transition-all"
+              class="py-1.5 px-3 rounded-md bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium border border-slate-300 shadow-xs flex items-center gap-1 transition-colors"
               title="Copy plain-text briefing to clipboard"
             >
-              <i data-lucide="clipboard" class="w-3.5 h-3.5"></i>
+              <i data-lucide="clipboard" class="w-3.5 h-3.5 text-slate-500"></i>
               <span>Copy</span>
             </button>
 
             <button
               id="btn-export-file"
               type="button"
-              class="py-2 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-mono text-xs font-medium border border-slate-700 flex items-center gap-1 transition-all"
-              title="Export Briefing Report as markdown/text file"
+              class="py-1.5 px-3 rounded-md bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium border border-slate-300 shadow-xs flex items-center gap-1 transition-colors"
+              title="Export Briefing Report as markdown file"
             >
-              <i data-lucide="download" class="w-3.5 h-3.5"></i>
+              <i data-lucide="download" class="w-3.5 h-3.5 text-slate-500"></i>
               <span>Export</span>
             </button>
 
             <button
               id="btn-copy-json"
               type="button"
-              class="py-2 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-mono text-xs font-medium border border-slate-700 flex items-center gap-1 transition-all"
+              class="py-1.5 px-3 rounded-md bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium border border-slate-300 shadow-xs flex items-center gap-1 transition-colors"
               title="Copy JSON Payload to clipboard"
             >
-              <i data-lucide="code" class="w-3.5 h-3.5"></i>
+              <i data-lucide="code" class="w-3.5 h-3.5 text-slate-500"></i>
               <span>JSON</span>
             </button>
           </div>
 
           <!-- Execution Simulation Console (Terminal Log) -->
-          <div id="simulation-console" class="hidden rounded-lg bg-slate-950 border border-slate-800 p-3 font-mono text-[11px] space-y-2">
-            <div class="flex items-center justify-between text-slate-400 pb-1.5 border-b border-slate-800">
+          <div id="simulation-console" class="hidden rounded-md bg-slate-900 border border-slate-800 p-3 font-mono text-xs space-y-2">
+            <div class="flex items-center justify-between text-slate-400 pb-1.5 border-b border-slate-800 text-[11px]">
               <span class="flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                <span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
                 <span>DISPATCH SIMULATOR TERMINAL</span>
               </span>
               <button id="close-sim-btn" class="text-slate-500 hover:text-slate-300">×</button>
             </div>
             
-            <div class="bg-amber-950/60 border border-amber-800/80 p-1.5 rounded text-[10px] text-amber-300 font-bold text-center">
-              SIMULATION ONLY — NO REAL DISPATCH OR EXTERNAL ACTION OCCURRED
+            <div class="bg-amber-950/80 border border-amber-800 p-1.5 rounded text-[10px] text-amber-300 font-bold text-center">
+              SIMULATION ONLY — NO OUTBOUND DISPATCH OR EXTERNAL ACTION OCCURRED
             </div>
 
-            <div id="simulation-log" class="space-y-1 max-h-40 overflow-y-auto text-slate-300">
+            <div id="simulation-log" class="space-y-1 max-h-40 overflow-y-auto text-slate-300 text-[11px]">
               <!-- Animated terminal logs appended here -->
             </div>
           </div>
 
           <!-- Syntax-Highlighted JSON Payload Inspector -->
-          <details id="json-viewer-details" class="rounded-lg bg-slate-900 border border-slate-800 text-xs overflow-hidden">
-            <summary class="p-2.5 font-mono text-[11px] text-slate-400 cursor-pointer select-none hover:text-slate-200 flex items-center justify-between">
+          <details id="json-viewer-details" class="rounded-md bg-slate-50 border border-slate-200 text-xs overflow-hidden">
+            <summary class="p-2.5 font-mono text-xs text-slate-600 cursor-pointer select-none hover:text-slate-900 flex items-center justify-between">
               <span class="flex items-center gap-1.5">
-                <i data-lucide="code-2" class="w-3.5 h-3.5 text-cyan-400"></i>
+                <i data-lucide="code-2" class="w-3.5 h-3.5 text-slate-500"></i>
                 <span>Raw Standardized EOC Dispatch Payload</span>
               </span>
-              <span class="text-[10px] text-slate-500">Toggle</span>
+              <span class="text-[11px] text-slate-400">Expand</span>
             </summary>
-            <div class="p-3 bg-slate-950/90 border-t border-slate-800">
-              <div class="bg-rose-950/40 border border-rose-900/60 p-1 rounded text-[10px] text-rose-300 font-mono font-bold text-center mb-2">
-                DRAFT PAYLOAD — NOT SENT TO ANY REAL SYSTEM
+            <div class="p-3 bg-slate-900 border-t border-slate-200">
+              <div class="bg-amber-900/60 border border-amber-700/60 p-1 rounded text-[10px] text-amber-200 font-mono font-bold text-center mb-2">
+                DRAFT PAYLOAD — NOT TRANSMITTED TO REAL SYSTEM
               </div>
-              <pre id="json-payload-display" class="font-mono text-[10px] text-emerald-400 overflow-x-auto max-h-56 p-2 rounded bg-black/60"></pre>
+              <pre id="json-payload-display" class="font-mono text-[11px] text-emerald-400 overflow-x-auto max-h-56 p-2 rounded bg-black/50"></pre>
             </div>
           </details>
 
           <!-- Safety Note / Legal Disclaimer -->
-          <div class="p-3 rounded-lg bg-slate-900/80 border border-slate-800 text-[11px] text-slate-400 space-y-1">
-            <div class="flex items-center gap-1 text-slate-300 font-semibold">
-              <i data-lucide="shield" class="w-3.5 h-3.5 text-cyan-400"></i>
-              <span>Safety & Operating Protocol</span>
+          <div class="p-3 rounded-md bg-slate-50 border border-slate-200 text-xs text-slate-600 space-y-1">
+            <div class="flex items-center gap-1 text-slate-800 font-semibold">
+              <i data-lucide="shield" class="w-3.5 h-3.5 text-slate-600"></i>
+              <span>Safety &amp; Operating Protocol</span>
             </div>
-            <p id="safety-note-text" class="leading-relaxed">
+            <p id="safety-note-text" class="leading-relaxed text-[11px] text-slate-500">
               SAARTHI AI is an automated triage decision-support prototype. It does not provide medical diagnosis, authorize medication dosages, or contact public safety dispatchers directly. For emergency assistance in India, dial 112 immediately.
             </p>
           </div>
@@ -659,6 +697,7 @@
         </div>
 
       </div>
+
     </section>
 
   </main>
@@ -670,10 +709,10 @@
   <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
   <!-- Footer -->
-  <footer class="mt-auto border-t border-slate-800/80 bg-[#0c1322] py-3 px-4 text-center text-xs text-slate-500 font-mono">
-    <div class="max-w-[1720px] mx-auto flex flex-wrap items-center justify-between gap-2">
-      <span>SAARTHI AI • Societal Good AI Hackathon Submission • Powered by Google Gemini 2.5 Flash</span>
-      <span class="flex items-center gap-2">
+  <footer class="mt-auto border-t border-slate-200 bg-white py-3 px-4 text-center text-xs text-slate-500">
+    <div class="max-w-[1440px] mx-auto flex flex-wrap items-center justify-between gap-2">
+      <span>SAARTHI AI • Human Intent-to-System Action Engine • Powered by Google Gemini</span>
+      <span class="flex items-center gap-2 text-slate-400">
         <span>Zero NPM Runtime Dependencies</span>
         <span>•</span>
         <span>Repository &lt; 10 MB</span>
@@ -682,8 +721,8 @@
   </footer>
 
   <!-- Scripts -->
-  <script src="demoData.js"></script>
-  <script src="ui.js"></script>
-  <script src="app.js"></script>
+  <script src="demoData.js?v=enterprise"></script>
+  <script src="ui.js?v=enterprise"></script>
+  <script src="app.js?v=enterprise"></script>
 </body>
 </html>

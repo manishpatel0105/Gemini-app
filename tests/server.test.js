@@ -103,4 +103,65 @@ test('Server startup, health endpoint, static serving, and API validation', asyn
 
     assert.strictEqual(statusCode, 400);
   });
+
+  // Test 7: CORS Preflight OPTIONS
+  await t.test('OPTIONS /api/analyze returns 204 with complete CORS headers', async () => {
+    const res = await fetch(`${baseUrl}/api/analyze`, {
+      method: 'OPTIONS',
+      headers: {
+        'Origin': 'https://example.com',
+        'Access-Control-Request-Method': 'POST'
+      }
+    });
+
+    assert.strictEqual(res.status, 204);
+    assert.strictEqual(res.headers.get('access-control-allow-origin'), '*');
+    assert.ok(res.headers.get('access-control-allow-methods').includes('POST'));
+    assert.ok(res.headers.get('access-control-allow-headers').includes('Content-Type'));
+  });
+
+  // Test 8: Method Not Allowed (405)
+  await t.test('Unsupported HTTP methods return 405 with structured error', async () => {
+    const putRes = await fetch(`${baseUrl}/api/analyze`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: 'test' })
+    });
+    assert.strictEqual(putRes.status, 405);
+    const putData = await putRes.json();
+    assert.strictEqual(putData.success, false);
+    assert.strictEqual(putData.code, 'METHOD_NOT_ALLOWED');
+
+    const postHealthRes = await fetch(`${baseUrl}/api/health`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({})
+    });
+    assert.strictEqual(postHealthRes.status, 405);
+    const healthData = await postHealthRes.json();
+    assert.strictEqual(healthData.success, false);
+    assert.strictEqual(healthData.code, 'METHOD_NOT_ALLOWED');
+  });
+
+  // Test 9: Unknown API Route returns 404 with structured error
+  await t.test('Unregistered /api/* route returns 404 with structured error', async () => {
+    const res = await fetch(`${baseUrl}/api/non_existent_endpoint`);
+    assert.strictEqual(res.status, 404);
+    const data = await res.json();
+    assert.strictEqual(data.success, false);
+    assert.strictEqual(data.code, 'NOT_FOUND');
+  });
+
+  // Test 10: Error responses never leak stack traces or internal server paths
+  await t.test('Error responses omit stack traces and internal filesystem paths', async () => {
+    const res = await fetch(`${baseUrl}/api/analyze`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: '' })
+    });
+    const data = await res.json();
+    assert.strictEqual(data.success, false);
+    assert.strictEqual(data.stack, undefined, 'Stack trace must NEVER be sent to client');
+    assert.ok(!JSON.stringify(data).includes('/Users/'), 'Internal filesystem paths must not be exposed');
+  });
 });

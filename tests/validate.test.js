@@ -8,7 +8,8 @@ const {
   validateAnalyzeRequest,
   verifyImageMagicBytes,
   validateAndNormalizeGeminiOutput,
-  applyDeterministicEmergencyOverride
+  applyDeterministicEmergencyOverride,
+  sanitizeEvidenceUrl
 } = require('../services/validate');
 
 test('validateAnalyzeRequest rejects non-object or null input', () => {
@@ -183,4 +184,135 @@ test('applyDeterministicEmergencyOverride forces Immediate urgency for cardiac a
   assert.ok(overridden.humanGuidance[0].includes('112'), 'Must advise calling 112 immediately');
   assert.strictEqual(overridden.actions[0].priority, 'Critical');
   assert.ok(overridden.safety_note.includes('DETERMINISTIC EMERGENCY SAFEGUARD ACTIVE'));
+});
+
+test('sanitizeEvidenceUrl accepts valid http/https URLs and rejects unsafe protocols', () => {
+  assert.strictEqual(sanitizeEvidenceUrl('https://ndma.gov.in/guidelines'), 'https://ndma.gov.in/guidelines');
+  assert.strictEqual(sanitizeEvidenceUrl('http://mohfw.gov.in/index.php?id=123'), 'http://mohfw.gov.in/index.php?id=123');
+
+  // Reject malicious schemes
+  assert.strictEqual(sanitizeEvidenceUrl('javascript:alert(1)'), '');
+  assert.strictEqual(sanitizeEvidenceUrl('data:text/html,<script>alert(1)</script>'), '');
+  assert.strictEqual(sanitizeEvidenceUrl('ftp://example.com/exploit'), '');
+  assert.strictEqual(sanitizeEvidenceUrl('file:///etc/passwd'), '');
+  assert.strictEqual(sanitizeEvidenceUrl('/relative/path/only'), '');
+  assert.strictEqual(sanitizeEvidenceUrl('not-a-valid-url'), '');
+  assert.strictEqual(sanitizeEvidenceUrl(null), '');
+  assert.strictEqual(sanitizeEvidenceUrl(12345), '');
+});
+
+test('validateAnalyzeRequest enforces strict mode and context enum validation', () => {
+  // Invalid mode
+  const badMode = validateAnalyzeRequest({
+    text: 'Valid report text here',
+    mode: 'unauthorized_mode'
+  });
+  assert.strictEqual(badMode.isValid, false);
+  assert.match(badMode.errors[0], /Allowed modes: "live" or "demo"/);
+
+  // Valid modes
+  assert.strictEqual(validateAnalyzeRequest({ text: 'Valid report', mode: 'live' }).isValid, true);
+  assert.strictEqual(validateAnalyzeRequest({ text: 'Valid report', mode: 'demo' }).isValid, true);
+
+  // Invalid context
+  const badContext = validateAnalyzeRequest({
+    text: 'Valid report text here',
+    context: 'unsupported_context_domain'
+  });
+  assert.strictEqual(badContext.isValid, false);
+  assert.match(badContext.errors[0], /Invalid context specified/);
+
+  // Valid contexts
+  for (const ctx of ['auto', 'community_safety', 'health_notes', 'public_service', 'traffic_civic', 'emergency_crisis']) {
+    assert.strictEqual(validateAnalyzeRequest({ text: 'Valid report', context: ctx }).isValid, true);
+  }
+});
+
+test('validateAndNormalizeGeminiOutput sanitizes malicious URLs in evidence sources', () => {
+  const modelOutput = {
+    title: 'Flood Triage',
+    intent: { said: 'Water rising', trueIntent: 'Evacuation request' },
+    urgency: 'Immediate',
+    confidenceScore: 0.9,
+    domain: 'DISASTER',
+    summary: 'Water level rising quickly',
+    facts: ['Water level 3 feet'],
+    unknowns: [],
+    conflicts: [],
+    extractedEntities: {
+      primaryIssue: 'Flood',
+      symptoms: [],
+      history: [],
+      risks: ['Drowning'],
+      locationContext: 'River bank'
+    },
+    verification: [
+      {
+        claim: 'NDRF team dispatched',
+        status: 'Verified',
+        primaryUrl: 'javascript:evil()',
+        evidence: [
+          {
+            source: 'Malicious Source',
+            url: 'javascript:alert("xss")',
+            text: 'Fake confirmation'
+          },
+          {
+            source: 'NDMA Official',
+            url: 'https://ndma.gov.in/bulletin',
+            text: 'Official confirmation'
+          }
+        ],
+        explanation: 'NDRF alert'
+      }
+    ],
+    actions: [{ step: 'Evacuate to high ground', priority: 'Critical', timing: 'Immediate' }],
+    humanGuidance: ['Move now'],
+    draftPayloads: []
+  };
+
+  const normalized = validateAndNormalizeGeminiOutput(modelOutput, 'Water rising');
+  const claim = normalized.verification[0];
+
+  // primaryUrl with javascript: protocol should be neutralized to empty string
+  assert.strictEqual(claim.primaryUrl, '');
+  // First evidence with javascript: URL should be stripped
+  assert.strictEqual(claim.evidence[0].url, '');
+  // Second evidence with https: should remain intact
+  assert.strictEqual(claim.evidence[1].url, 'https://ndma.gov.in/bulletin');
+});
+
+test('Clinical Safety Mandate: automatically enforces non-diagnostic clinical disclaimer for medical domain', () => {
+  const medicalModelOutput = {
+    title: 'Patient Medication Question',
+    intent: { said: 'Father taking Metformin, feels dizzy', trueIntent: 'Medication inquiry' },
+    urgency: 'Moderate',
+    confidenceScore: 0.85,
+    domain: 'MEDICAL',
+    summary: 'Elderly patient with dizziness on Metformin',
+    facts: ['Takes Metformin'],
+    unknowns: ['Blood sugar level'],
+    conflicts: [],
+    extractedEntities: {
+      primaryIssue: 'Dizziness and medication inquiry',
+      symptoms: ['Dizziness'],
+      history: ['Diabetes'],
+      risks: ['Hypoglycemia'],
+      locationContext: 'Home'
+    },
+    verification: [],
+    actions: [{ step: 'Contact physician', priority: 'High', timing: 'Prompt' }],
+    humanGuidance: ['Sit down and rest'],
+    draftPayloads: [],
+    safety_note: 'Standard notice' // Lacks clinical disclaimer
+  };
+
+  const normalized = validateAndNormalizeGeminiOutput(medicalModelOutput, 'Father taking Metformin, feels dizzy');
+
+  // Must prepend clinical safety disclaimer
+  assert.ok(normalized.safety_note.includes('CLINICAL SAFETY MANDATE'));
+  assert.ok(normalized.safety_note.includes('does NOT provide medical diagnoses'));
+  assert.ok(normalized.safetyNotes.some(s => s.includes('CLINICAL SAFETY MANDATE')));
+  assert.strictEqual(normalized.actions[0].requiresHumanApproval, true);
+  assert.strictEqual(normalized.draftPayloads[0].sent, false);
 });

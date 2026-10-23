@@ -1,10 +1,10 @@
 # 🛡️ SAARTHI AI — Universal Human Intent-to-System Action Engine
 > *"From human confusion to verified action."*
 
-[![Gemini 2.5 Flash](https://img.shields.io/badge/Model-Gemini%202.5%20Flash-blue.svg)](https://deepmind.google/technologies/gemini/)
+[![Gemini Flash](https://img.shields.io/badge/Model-Gemini%20Flash-blue.svg)](https://deepmind.google/technologies/gemini/)
 [![Zero NPM Dependencies](https://img.shields.io/badge/Dependencies-Zero%20Runtime%20NPM-emerald.svg)](https://nodejs.org)
-[![Repository Size](https://img.shields.io/badge/Repo%20Size-%3C%20200%20KB%20(Limit%2010MB)-cyan.svg)](scripts/repo-size.js)
-[![Test Suite](https://img.shields.io/badge/Tests-22%20Passing-brightgreen.svg)](tests/)
+[![Repository Size](https://img.shields.io/badge/Repo%20Size-%3C%20250%20KB%20(Limit%2010MB)-cyan.svg)](scripts/repo-size.js)
+[![Test Suite](https://img.shields.io/badge/Tests-36%20Passing-brightgreen.svg)](tests/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 ---
@@ -15,12 +15,13 @@
 
 SAARTHI AI bridges the gap between chaotic human distress signals and structured, evidence-grounded system action directives.
 
-Powered by **Google Gemini 2.5 Flash**, SAARTHI AI:
+Powered by **Google Gemini**, SAARTHI AI:
 1. **Decodes True Underlying Intent** beneath raw panic and fragmented language.
 2. **Triages Urgency** (`Immediate`, `High`, `Moderate`, `Low`, `Unclear`) with deterministic life-safety override safeguards.
-3. **Grounds Claims Against Real Evidence** via Google Search Grounding metadata, strictly downgrading unverified or contradicted assertions.
-4. **Drafts Standardized System Dispatch Payloads** (e.g. `EMS_DISPATCH_UNIT`, `HOSPITAL_ER_PREALERT`, `TRAFFIC_GRID_REROUTE`, `POWER_GRID_ISOLATE`) formatted for immediate human operator approval.
-5. **Provides Immediate Physical Guidance** for on-scene bystanders before emergency responders arrive.
+3. **Elevates the Single Most Useful Next Step** in a prominent hero callout at the top of the decision workspace.
+4. **Grounds Claims Against Real Evidence** via Google Search Grounding metadata, strictly downgrading unverified or contradicted assertions to *Not independently verified*.
+5. **Drafts Standardized System Dispatch Payloads** (e.g. `EMS_DISPATCH_GATEWAY`, `DISASTER_MGMT_EOC`, `TRAFFIC_GRID_REROUTE`) requiring human operator approval.
+6. **Enforces Clinical & Emergency Boundaries**: Non-diagnostic triage, no unsupported medication dosing, and automatic escalation to 112/108 services.
 
 ---
 
@@ -28,12 +29,12 @@ Powered by **Google Gemini 2.5 Flash**, SAARTHI AI:
 
 ```mermaid
 graph TD
-    A[Human Distress Signal: Hinglish/Hindi/English/Voice/Photo] --> B[Human Input Hub (Web Speech + 4MB Multimodal Image)]
-    B --> C[Node.js Standard HTTP Server (Zero Runtime NPM)]
+    A[Human Distress Signal: Hinglish/Hindi/English/Voice/Photo] --> B[Human Input Hub: Web Speech + Multimodal Image]
+    B --> C[Node.js Standard HTTP Server: Zero Runtime NPM]
     
     C --> D{Live Gemini Key Present?}
     D -- No / Demo Mode --> E[Deterministic Fixtures (demoData.js)]
-    D -- Yes / Live Mode --> F[Gemini 2.5 Flash REST Client]
+    D -- Yes / Live Mode --> F[Gemini Flash REST Client]
     
     F --> G[Pass 1: Google Search Grounding Retrieval]
     G --> H[Pass 2: Structured JSON Synthesis (responseSchema)]
@@ -45,10 +46,9 @@ graph TD
     I --> K[Grounding Citation Correlation & Verification Downgrades]
     I --> L[Draft Status Enforcement: sent=false & humanApproval=true]
     
-    L --> M[Tactical EOC Interface (3 Columns)]
-    M --> N[Column 1: Distress Stream & Presets]
-    M --> O[Column 2: Intent Bridge & Evidence]
-    M --> P[Column 3: Action Matrix & Dispatch Simulator]
+    L --> M[Enterprise Decision Workspace (2 Balanced Columns)]
+    M --> N[Column 1: Distress Stream, Presets & Toolbar (~40%)]
+    M --> O[Column 2: Decision Workspace, Hero Step & Directives (~60%)]
 ```
 
 ---
@@ -58,8 +58,8 @@ graph TD
 | Requirement | Implementation in SAARTHI AI |
 | :--- | :--- |
 | **Runtime Dependencies** | **Zero runtime npm dependencies**. Powered entirely by Node.js built-ins (`http`, `fs`, `path`, `crypto`, native `fetch`). |
-| **Repository Size** | **178.85 KB** total working tree size (Strict limit: < 10 MB). Uses `scripts/repo-size.js` for automated audit. |
-| **Model** | **Google Gemini 2.5 Flash** (`gemini-2.5-flash`) via official Google REST API (`x-goog-api-key`). |
+| **Repository Size** | **~241 KB** total working tree size (Strict limit: < 10 MB). Uses `scripts/repo-size.js` for automated audit. |
+| **Model** | **Google Gemini** (`gemini-3.1-flash-lite` or `gemini-2.5-flash`) via official Google REST API (`x-goog-api-key`). |
 | **Multimodal** | Audio speech recognition via browser Web Speech API (`en-IN`, `hi-IN`); scene photos up to 4 MB (PNG, JPEG, WEBP) with binary magic byte validation. |
 | **API Key Privacy** | `GEMINI_API_KEY` is exclusively read on the server. Never leaked to client code, Git, or API responses. |
 | **Judge Demo Mode** | Full offline exploration mode with deterministic high-fidelity fixtures in `public/demoData.js`. Persistent warning banner displayed. |
@@ -68,40 +68,30 @@ graph TD
 
 ---
 
-## 🖥️ 3-Column Emergency Operations Center (EOC) UI
+## 🖥️ Enterprise Decision Workspace UI
 
-The web interface is built around an **Emergency Operations Center** design language (Slate-950 canvas, deep navy command cards, status-specific neon tokens):
+Inspired by the clarity, restraint, and utility of **Linear** and **Stripe**:
 
-### Column 1 — Human Input Hub
-- **Distress Stream Textarea**: Supports multi-lingual mixed input (Hindi, English, Hinglish) with live character counter (0–4000).
-- **Web Speech API**: Real-time microphone capture with audio waveform pulse, language toggle (`en-IN` / `hi-IN`), and browser error handling.
-- **Multimodal Drop Zone**: Drag-and-drop file upload for PNG, JPEG, WEBP up to 4 MB with thumbnail preview and replace/remove controls.
-- **One-Click Verified Demo Presets**:
-  1. **Medical Crisis (Hinglish)**: 68yo father, acute crushing chest pain, sweating, diabetes, Telma 40, stranded in NH48 toll traffic.
-  2. **Community Safety (Disaster)**: Minto Bridge 5ft flash flood, submerged school bus with 18 children, snapped high-tension wire hanging overhead.
-  3. **Health & Prescription Navigator**: 74yo on Warfarin prescribed Ciprofloxacin, experiencing facial hives, swelling, and dizziness.
-- **Turn This Into a Plan**: Tactical analysis trigger.
-- **New Case**: Instant workspace reset.
+### Column 1 — Human Input Hub (~40% Desktop Grid)
+- **Narrative Input Textarea**: Supports multi-lingual mixed input (Hindi, English, Hinglish) with live character counter (0–4000).
+- **Restrained Bottom Toolbar**:
+  - **Web Speech API**: Real-time microphone capture with audio waveform pulse and language toggle (`en-IN` / `hi-IN`).
+  - **Multimodal Drop Zone**: Image attachment for PNG, JPEG, WEBP up to 4 MB with thumbnail preview and replace/remove controls.
+- **Interactive Quick-Start Presets**:
+  1. **Community Emergency**: Flash flood at underpass, fallen tree, live power lines, 18 trapped school passengers.
+  2. **Clinical Health Notes**: Elderly diabetic patient on Metformin, acute oliguria following OTC NSAID (Ibuprofen).
+  3. **Public Aid Navigation**: Senior pension (IGNOAPS) & digital UDID disability application with intermediary fee protection.
+  4. **Acute Medical Alert**: Acute crushing substernal chest pain radiating to left arm with diaphoresis.
 
-### Column 2 — Gemini Intent Bridge
-- **Triage Badges**: Urgency tag (`IMMEDIATE`, `HIGH`, `MODERATE`, `LOW`, `UNCLEAR`) and Domain indicator (`MEDICAL`, `DISASTER`, `CIVIC`, `TRAFFIC`, `OTHER`).
-- **Model Confidence Meter**: Percentage model confidence with disclaimer label (*"Estimated by Gemini 2.5 Flash"*).
-- **Intent Contrast Box**: Direct juxtaposition of *"What the Person Said"* vs *"Decoded Underlying Intent"*.
-- **Extracted Entities**: Primary Issue, Symptoms, Medical History & Current Meds, Detected Risks, and Location Clues.
-- **Facts, Unknowns & Conflicts**: Triaged lists highlighting critical missing information.
-- **Grounding Verification List**: Authentic external evidence citations with live links, source titles, retrieval timestamps, and status badges (`Verified`, `Partially verified`, `Unverified`, `Contradicted`, `Verification unavailable`).
-
-### Column 3 — Structured Action Workspace
-- **Immediate Physical Guidance**: 3 prioritized on-scene physical actions for bystanders before first responders arrive.
-- **Target System Action Directives**:
-  - Target system (`EMS_DISPATCH_GATEWAY`, `POWER_GRID_ISOLATE`, `TRAFFIC_GRID_REROUTE`, etc.)
-  - Action code (e.g. `EMS_DISPATCH_UNIT`)
-  - Priority badge (`Critical`, `High`, `Normal`)
-  - Recommended timing (`< 2 mins`)
-  - Operational rationale & mandatory human approval requirement.
-  - Visible Draft watermark: `[DRAFT PAYLOAD — NOT SENT TO ANY REAL SYSTEM]`.
-- **Dispatch Simulation Console**: Interactive animated terminal log simulating the dispatch handshake, queue assignment, and validation checks.
-- **Syntax-Highlighted JSON Inspector**: Collapsible viewer for the standardized dispatch payload.
+### Column 2 — Analysis Results Workspace (~60% Desktop Grid)
+- **Top Situation Header**: Urgency badge (`IMMEDIATE`, `HIGH`, `MODERATE`, `LOW`, `UNCLEAR`), domain badge, and model confidence rating.
+- **Primary Recommended Next Step**: Prominent hero action card displaying the single most critical immediate directive with operational rationale and timing.
+- **Decoded Operational Intent**: Direct juxtaposition of *"What was communicated"* vs *"Decoded operational intent"*.
+- **Immediate Physical Guidance (On-Scene)**: 3 numbered on-scene physical actions for bystanders before first responders arrive.
+- **Known Facts & Critical Unknowns**: Side-by-side comparative grid separating verified assertions from missing information.
+- **Evidence & Grounding Verification**: Authentic external citations with verified external URLs, explicitly distinguishing reported statements from model assessments.
+- **Target System Action Directives**: Structured payloads (`EMS_DISPATCH_GATEWAY`, `POWER_GRID_ISOLATE`, `TRAFFIC_GRID_REROUTE`) with mandatory human approval badges.
+- **Dispatch Simulation Console**: Interactive animated terminal log simulating dispatch queue assignment and validation checks.
 - **Briefing & JSON Export**: One-click clipboard copy for plain-text operations briefings and JSON telemetry.
 
 ---

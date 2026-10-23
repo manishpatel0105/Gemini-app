@@ -71,6 +71,7 @@ function setSecurityHeaders(res) {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader(
     'Content-Security-Policy',
     "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self'; frame-ancestors 'none';"
@@ -188,8 +189,11 @@ function serveStaticFile(req, res, parsedUrl) {
 
     setSecurityHeaders(res);
     res.setHeader('Content-Type', contentType);
-    res.setHeader('Content-Length', stats.size);
-    res.setHeader('Cache-Control', 'public, max-age=3600');
+    if (ext === '.html') {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    } else {
+      res.setHeader('Cache-Control', 'no-cache');
+    }
 
     const stream = fs.createReadStream(safePath);
     stream.on('error', () => {
@@ -201,25 +205,57 @@ function serveStaticFile(req, res, parsedUrl) {
   });
 }
 
+// Helper to send standardized error JSON responses
+function sendError(res, statusCode, message, code = 'ERROR', details = null, extra = {}) {
+  sendJson(res, statusCode, {
+    success: false,
+    error: message,
+    code,
+    ...(details ? { details } : {}),
+    ...extra
+  });
+}
+
 // Server factory for testing and production
 function createServer() {
   const geminiService = new GeminiService();
 
   const server = http.createServer(async (req, res) => {
+    const startTime = Date.now();
     const clientIp = req.socket.remoteAddress || '127.0.0.1';
     const parsedUrl = new URL(req.url, 'http://localhost');
 
+    // Concise, privacy-preserving operational logger (never logs bodies or personal notes)
+    res.on('finish', () => {
+      const duration = Date.now() - startTime;
+      if (process.env.NODE_ENV !== 'test') {
+        console.log(`[HTTP] ${req.method} ${parsedUrl.pathname} ${res.statusCode} (${duration}ms)`);
+      }
+    });
+
+    // Handle CORS preflight
+    if (req.method === 'OPTIONS') {
+      setSecurityHeaders(res);
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-goog-api-key');
+      res.setHeader('Access-Control-Max-Age', '86400');
+      res.writeHead(204);
+      res.end();
+      return;
+    }
+
     // Apply rate limiting
     if (!checkRateLimit(clientIp)) {
-      sendJson(res, 429, {
-        error: 'Too Many Requests',
-        message: 'Rate limit exceeded. Please wait before submitting more requests.'
-      });
+      sendError(res, 429, 'Rate limit exceeded. Please wait before submitting more requests.', 'RATE_LIMIT_EXCEEDED');
       return;
     }
 
     // API Routes
-    if (parsedUrl.pathname === '/api/health' && req.method === 'GET') {
+    if (parsedUrl.pathname === '/api/health') {
+      if (req.method !== 'GET' && req.method !== 'HEAD') {
+        sendError(res, 405, `Method ${req.method} not allowed for /api/health`, 'METHOD_NOT_ALLOWED');
+        return;
+      }
       const hasApiKey = Boolean(process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY.trim());
       sendJson(res, 200, {
         status: 'ok',
@@ -239,16 +275,17 @@ function createServer() {
       return;
     }
 
-    if (parsedUrl.pathname === '/api/analyze' && req.method === 'POST') {
+    if (parsedUrl.pathname === '/api/analyze') {
+      if (req.method !== 'POST') {
+        sendError(res, 405, `Method ${req.method} not allowed for /api/analyze`, 'METHOD_NOT_ALLOWED');
+        return;
+      }
       try {
         const body = await readJsonBody(req);
         const validation = validateAnalyzeRequest(body);
 
         if (!validation.isValid) {
-          sendJson(res, 400, {
-            error: 'Validation Error',
-            details: validation.errors
-          });
+          sendError(res, 400, 'Validation Error', 'VALIDATION_FAILED', validation.errors);
           return;
         }
 
@@ -268,7 +305,7 @@ function createServer() {
           return;
         }
 
-        // Live Gemini 2.5 Flash execution
+        // Live Gemini execution
         try {
           const livePlan = await geminiService.analyzeIntent({
             text,
@@ -288,21 +325,32 @@ function createServer() {
           console.error(`[Gemini Execution Error] ${apiErr.code || 'UNKNOWN'}: ${apiErr.message}`);
 
           const statusCode = apiErr.statusCode || 500;
-          sendJson(res, statusCode, {
-            success: false,
-            error: apiErr.message || 'Error communicating with Google Gemini 2.5 Flash API.',
-            code: apiErr.code || 'GEMINI_FAILURE',
-            suggestDemo: true,
-            notice: 'Live API analysis failed. You may explore full capabilities without an API key using Demo Mode.'
-          });
+          sendError(
+            res,
+            statusCode,
+            apiErr.message || 'Error communicating with Google Gemini API.',
+            apiErr.code || 'GEMINI_FAILURE',
+            null,
+            {
+              suggestDemo: true,
+              notice: 'Live API analysis failed. You may explore full capabilities without an API key using Demo Mode.'
+            }
+          );
         }
 
       } catch (err) {
         const statusCode = err.statusCode || 500;
-        sendJson(res, statusCode, {
-          error: err.message || 'Internal server error processing request.'
-        });
+        const safeMessage = statusCode >= 500
+          ? 'An internal server error occurred while processing the request.'
+          : (err.message || 'Error processing request.');
+        sendError(res, statusCode, safeMessage, err.code || 'SERVER_ERROR');
       }
+      return;
+    }
+
+    // Unmatched API endpoint 404
+    if (parsedUrl.pathname.startsWith('/api/')) {
+      sendError(res, 404, `Endpoint ${parsedUrl.pathname} not found.`, 'NOT_FOUND');
       return;
     }
 
@@ -313,7 +361,7 @@ function createServer() {
     }
 
     // Method not allowed
-    sendJson(res, 405, { error: `Method ${req.method} not allowed.` });
+    sendError(res, 405, `Method ${req.method} not allowed.`, 'METHOD_NOT_ALLOWED');
   });
 
   return server;
@@ -326,7 +374,7 @@ if (require.main === module) {
     const hasKey = Boolean(process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY.trim());
     console.log(`\n======================================================`);
     console.log(`  🛡️  SAARTHI AI — Universal Human Intent Engine`);
-    console.log(`  Model: Google Gemini 2.5 Flash`);
+    console.log(`  Model: Google Gemini (${process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite'})`);
     console.log(`  Status: Operational on http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT}`);
     console.log(`  Mode: ${hasKey ? '🟢 LIVE (API key configured)' : '🟡 DEMO MODE (API key not configured)'}`);
     console.log(`======================================================\n`);

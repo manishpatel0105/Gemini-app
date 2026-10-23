@@ -73,24 +73,38 @@ function validateAnalyzeRequest(body) {
     }
   }
 
+  // Mode validation (optional)
+  if (body.mode !== undefined && typeof body.mode !== 'string') {
+    errors.push('Mode must be a string ("live" or "demo").');
+  } else if (typeof body.mode === 'string' && !['live', 'demo'].includes(body.mode.trim().toLowerCase())) {
+    errors.push('Invalid mode specified. Allowed modes: "live" or "demo".');
+  }
+
   // Language validation (optional)
-  if (body.language && typeof body.language !== 'string') {
+  if (body.language !== undefined && typeof body.language !== 'string') {
     errors.push('Language must be a string code (e.g. "en-IN", "hi-IN").');
   }
 
   // Context validation (optional)
   const allowedContexts = ['auto', 'community_safety', 'health_notes', 'public_service', 'traffic_civic', 'emergency_crisis'];
+  if (body.context !== undefined && typeof body.context !== 'string') {
+    errors.push('Context must be a string identifier.');
+  } else if (typeof body.context === 'string' && !allowedContexts.includes(body.context.trim().toLowerCase())) {
+    errors.push(`Invalid context specified. Allowed contexts: ${allowedContexts.join(', ')}.`);
+  }
+
   const rawContext = typeof body.context === 'string' ? body.context.trim().toLowerCase() : 'auto';
   const context = allowedContexts.includes(rawContext) ? rawContext : 'auto';
+  const mode = typeof body.mode === 'string' && body.mode.trim().toLowerCase() === 'demo' ? 'demo' : 'live';
 
   return {
     isValid: errors.length === 0,
     errors,
     cleaned: {
       text,
-      language: body.language || 'en-IN',
+      language: typeof body.language === 'string' ? body.language : 'en-IN',
       context,
-      mode: body.mode === 'demo' ? 'demo' : 'live'
+      mode
     }
   };
 }
@@ -113,6 +127,24 @@ function verifyImageMagicBytes(buffer, declaredMime) {
   if (declaredMime.includes('webp')) return isRiff;
 
   return false;
+}
+
+/**
+ * Validate and sanitize evidence URLs (must be well-formed http: or https: URL)
+ */
+function sanitizeEvidenceUrl(urlStr) {
+  if (!urlStr || typeof urlStr !== 'string') return '';
+  try {
+    const trimmed = urlStr.trim();
+    if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://')) return '';
+    const parsed = new URL(trimmed);
+    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+      return parsed.href;
+    }
+  } catch {
+    // Malformed URL
+  }
+  return '';
 }
 
 /**
@@ -207,26 +239,30 @@ function validateAndNormalizeGeminiOutput(raw, originalInput = '') {
         if (foundStatus) status = foundStatus;
       }
 
-      // Check evidence authenticity
+      // Check evidence authenticity and sanitize URLs
       const evidenceList = Array.isArray(v.evidence) ? v.evidence.map(e => ({
-        source: String(e.source || 'Grounding Knowledge Base'),
-        url: String(e.url || ''),
-        snippet: String(e.snippet || ''),
+        source: String(e.source || 'Grounding Knowledge Base').trim().slice(0, 300),
+        url: sanitizeEvidenceUrl(e.url),
+        snippet: String(e.snippet || '').trim().slice(0, 1000),
         retrievedAt: String(e.retrievedAt || new Date().toISOString())
       })) : [];
 
-      // GUARD: If claim claims "Verified", but evidence is empty or contains no URL/source, downgrade
-      if (status === 'Verified' && evidenceList.length === 0) {
+      // GUARD: Never mark content verified merely because model generated it.
+      // Requires an authentic, reachable HTTP/HTTPS URL and valid external source.
+      const hasAuthenticUrl = evidenceList.some(e => Boolean(e.url && (e.url.startsWith('http://') || e.url.startsWith('https://'))));
+      if (status === 'Verified' && (!hasAuthenticUrl || evidenceList.length === 0)) {
         status = 'Verification unavailable';
       }
 
-      const primaryUrl = v.evidenceUrl || (evidenceList.length > 0 ? evidenceList[0].url : '') || '';
-      const explanationText = typeof v.explanation === 'string' ? v.explanation.trim() : (typeof v.evidenceExplanation === 'string' ? v.evidenceExplanation.trim() : '');
+      const rawUrl = v.evidenceUrl || v.primaryUrl || '';
+      const primaryUrl = sanitizeEvidenceUrl(rawUrl) || (evidenceList.length > 0 ? evidenceList[0].url : '') || '';
+      const explanationText = typeof v.explanation === 'string' ? v.explanation.trim().slice(0, 1000) : (typeof v.evidenceExplanation === 'string' ? v.evidenceExplanation.trim().slice(0, 1000) : '');
 
       normalized.verification.push({
         claim,
         status,
         evidenceUrl: primaryUrl,
+        primaryUrl,
         evidenceExplanation: explanationText,
         evidence: evidenceList,
         explanation: explanationText
@@ -328,6 +364,15 @@ function validateAndNormalizeGeminiOutput(raw, originalInput = '') {
   let safetyNotesList = Array.isArray(raw.safetyNotes) && raw.safetyNotes.length > 0
     ? raw.safetyNotes.map(String).filter(s => s.trim())
     : [safetyNoteStr];
+
+  // Clinical Safety Mandate: If medical domain or symptoms are present, enforce non-diagnostic disclaimer
+  const isMedicalDomain = normalized.domain === 'MEDICAL' || /(symptom|doctor|medicat|patient|clinic|hospital|fever|tablet|mg|dose)/i.test(`${originalInput} ${normalized.extractedEntities.primaryIssue}`);
+  const clinicalDisclaimer = 'CLINICAL SAFETY MANDATE: SAARTHI AI is an automated triage decision-support prototype. It does NOT provide medical diagnoses, prescribe medications, or replace formal clinical judgment. For emergency symptoms, dial 112 / 108 immediately.';
+
+  if (isMedicalDomain && !safetyNotesList.some(s => s.includes('CLINICAL') || s.includes('diagnos'))) {
+    safetyNotesList.unshift(clinicalDisclaimer);
+    safetyNoteStr = clinicalDisclaimer;
+  }
 
   normalized.safety_note = safetyNoteStr;
   normalized.safetyNotes = safetyNotesList;
@@ -432,6 +477,7 @@ module.exports = {
   verifyImageMagicBytes,
   validateAndNormalizeGeminiOutput,
   applyDeterministicEmergencyOverride,
+  sanitizeEvidenceUrl,
   VALID_DOMAINS,
   VALID_URGENCIES,
   VALID_ACTION_PRIORITIES,

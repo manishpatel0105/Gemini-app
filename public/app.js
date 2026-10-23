@@ -32,11 +32,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = await res.json();
         state.hasApiKey = Boolean(data.hasApiKey);
         
+        const modelBadge = document.getElementById('model-badge');
+        if (modelBadge && data.model) {
+          modelBadge.textContent = data.model.toUpperCase();
+        }
+
         // If server has API key configured, default to live mode; otherwise stay in demo mode
         if (state.hasApiKey) {
           state.mode = 'live';
           UI.setModeVisuals('live');
-          UI.setHealthDisplay({ online: true, hasKey: true, text: 'Gemini 2.5 Live' });
+          UI.setHealthDisplay({ online: true, hasKey: true, text: 'Gemini Live' });
         } else {
           state.mode = 'demo';
           UI.setModeVisuals('demo');
@@ -330,6 +335,16 @@ document.addEventListener('DOMContentLoaded', () => {
   if (elements.presetHealth) elements.presetHealth.addEventListener('click', () => loadPreset('health_organization'));
   if (elements.presetPublic) elements.presetPublic.addEventListener('click', () => loadPreset('public_service'));
   if (elements.presetMedical) elements.presetMedical.addEventListener('click', () => loadPreset('medical_crisis'));
+
+  // Quick-start buttons from the Empty State
+  const emptyPresetCommunity = document.getElementById('empty-preset-community');
+  if (emptyPresetCommunity) {
+    emptyPresetCommunity.addEventListener('click', () => loadPreset('community_safety'));
+  }
+  const emptyPresetHealth = document.getElementById('empty-preset-health');
+  if (emptyPresetHealth) {
+    emptyPresetHealth.addEventListener('click', () => loadPreset('health_organization'));
+  }
 
   // =========================================================================
   // 7. Primary Action: "Turn This Into a Plan"

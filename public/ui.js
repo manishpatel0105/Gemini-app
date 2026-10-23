@@ -61,6 +61,10 @@ const UI = (() => {
     confidenceBar: document.getElementById('confidence-bar'),
     planTitle: document.getElementById('plan-title'),
     planSummary: document.getElementById('plan-summary'),
+    heroActionCard: document.getElementById('hero-action-card'),
+    heroActionStep: document.getElementById('hero-action-step'),
+    heroActionWhy: document.getElementById('hero-action-why'),
+    heroActionTiming: document.getElementById('hero-action-timing'),
     intentSaid: document.getElementById('intent-said'),
     intentTrue: document.getElementById('intent-true'),
     entityPrimary: document.getElementById('entity-primary'),
@@ -126,7 +130,7 @@ const UI = (() => {
       elements.btnAnalyze.classList.add('opacity-70', 'cursor-not-allowed');
       elements.btnAnalyze.innerHTML = `
         <span class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-        <span>Synthesizing Operational Matrix...</span>
+        <span>Analyzing situation...</span>
       `;
       announceToScreenReader('Analyzing report and decoding intent...');
     } else {
@@ -136,8 +140,8 @@ const UI = (() => {
       elements.btnAnalyze.disabled = false;
       elements.btnAnalyze.classList.remove('opacity-70', 'cursor-not-allowed');
       elements.btnAnalyze.innerHTML = `
-        <i data-lucide="play-circle" class="w-4 h-4"></i>
-        <span>Turn This Into a Plan</span>
+        <i data-lucide="play" class="w-4 h-4 fill-current"></i>
+        <span>Analyze situation</span>
       `;
       if (window.lucide) window.lucide.createIcons();
     }
@@ -156,16 +160,16 @@ const UI = (() => {
    * Display Toast message
    */
   function showToast(message, type = 'info') {
-    const toast = createElement('div', 'flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-mono shadow-xl transition-all pointer-events-auto transform translate-y-2 opacity-0');
+    const toast = createElement('div', 'flex items-center gap-2 px-3.5 py-2 rounded-md text-xs font-medium shadow-md transition-all pointer-events-auto transform translate-y-2 opacity-0');
     
     if (type === 'success') {
-      toast.className += ' bg-emerald-950/90 text-emerald-200 border border-emerald-700/80';
+      toast.className += ' bg-slate-900 text-white border border-slate-800';
     } else if (type === 'error') {
-      toast.className += ' bg-rose-950/90 text-rose-200 border border-rose-700/80';
+      toast.className += ' bg-rose-600 text-white border border-rose-700';
     } else if (type === 'warning') {
-      toast.className += ' bg-amber-950/90 text-amber-200 border border-amber-700/80';
+      toast.className += ' bg-amber-600 text-white border border-amber-700';
     } else {
-      toast.className += ' bg-slate-900/95 text-slate-200 border border-slate-700';
+      toast.className += ' bg-slate-900 text-white border border-slate-800';
     }
 
     toast.textContent = message;
@@ -201,6 +205,8 @@ const UI = (() => {
     elements.actionContent.classList.add('hidden');
     elements.simulationConsole.classList.add('hidden');
     elements.caseBadge.textContent = 'CASE #READY';
+    if (elements.heroActionStep) elements.heroActionStep.textContent = '...';
+    if (elements.heroActionWhy) elements.heroActionWhy.textContent = '...';
 
     elements.errorBanner.classList.add('hidden');
     showToast('Workspace reset for a new incident case.');
@@ -212,12 +218,12 @@ const UI = (() => {
    */
   function setModeVisuals(mode) {
     if (mode === 'live') {
-      elements.modeLiveBtn.className = 'px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-all bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-semibold';
-      elements.modeDemoBtn.className = 'px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-all text-slate-400 hover:text-white';
+      elements.modeLiveBtn.className = 'px-3 py-1.5 rounded-md flex items-center gap-1.5 text-xs font-medium bg-white text-slate-900 shadow-sm border border-slate-200 transition-colors';
+      elements.modeDemoBtn.className = 'px-3 py-1.5 rounded-md flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-slate-800 transition-colors';
       elements.demoBanner.classList.add('hidden');
     } else {
-      elements.modeLiveBtn.className = 'px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-all text-slate-400 hover:text-white';
-      elements.modeDemoBtn.className = 'px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-all bg-amber-500/20 text-amber-300 border border-amber-500/40 font-semibold';
+      elements.modeLiveBtn.className = 'px-3 py-1.5 rounded-md flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-slate-800 transition-colors';
+      elements.modeDemoBtn.className = 'px-3 py-1.5 rounded-md flex items-center gap-1.5 text-xs font-medium bg-white text-slate-900 shadow-sm border border-slate-200 transition-colors';
       elements.demoBanner.classList.remove('hidden');
     }
   }
@@ -229,8 +235,8 @@ const UI = (() => {
     elements.healthLabel.textContent = text;
     if (online) {
       elements.healthDot.className = hasKey
-        ? 'w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#10b981]'
-        : 'w-2 h-2 rounded-full bg-amber-400';
+        ? 'w-2 h-2 rounded-full bg-teal-500'
+        : 'w-2 h-2 rounded-full bg-amber-500';
     } else {
       elements.healthDot.className = 'w-2 h-2 rounded-full bg-rose-500';
     }
@@ -281,6 +287,32 @@ const UI = (() => {
     elements.planTitle.textContent = plan.title || 'Incident Action Plan';
     elements.planSummary.textContent = plan.summary || 'Summary unavailable.';
 
+    // 5b. Single Most Useful Next Step (Hero Recommendation)
+    const topAction = (plan.actions && plan.actions.length > 0) ? plan.actions[0] : null;
+    const topGuidance = (plan.humanGuidance && plan.humanGuidance.length > 0) ? plan.humanGuidance[0] : null;
+
+    if (elements.heroActionStep) {
+      if (topAction) {
+        elements.heroActionStep.textContent = topAction.step;
+        elements.heroActionWhy.textContent = topAction.why ? `Rationale: ${topAction.why}` : 'Immediate priority operational directive.';
+        if (elements.heroActionTiming) {
+          elements.heroActionTiming.textContent = topAction.timing || 'Immediate';
+        }
+      } else if (topGuidance) {
+        elements.heroActionStep.textContent = topGuidance;
+        elements.heroActionWhy.textContent = 'Immediate on-scene safety priority.';
+        if (elements.heroActionTiming) {
+          elements.heroActionTiming.textContent = 'Immediate';
+        }
+      } else {
+        elements.heroActionStep.textContent = 'Initiate manual on-scene situation verification.';
+        elements.heroActionWhy.textContent = 'Confirm incident details with on-scene reporting party.';
+        if (elements.heroActionTiming) {
+          elements.heroActionTiming.textContent = 'Immediate';
+        }
+      }
+    }
+
     // 6. Intent comparison
     elements.intentSaid.textContent = `"${plan.intent?.said || ''}"`;
     elements.intentTrue.textContent = plan.intent?.trueIntent || '';
@@ -293,21 +325,21 @@ const UI = (() => {
     // Symptoms tags
     elements.entitySymptoms.replaceChildren();
     (entities.symptoms || []).forEach(sym => {
-      const tag = createElement('span', 'px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700 text-[10px] font-mono', sym);
+      const tag = createElement('span', 'px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200 text-xs font-medium', sym);
       elements.entitySymptoms.appendChild(tag);
     });
 
     // History tags
     elements.entityHistory.replaceChildren();
     (entities.history || []).forEach(hist => {
-      const tag = createElement('span', 'px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700 text-[10px] font-mono', hist);
+      const tag = createElement('span', 'px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200 text-xs font-medium', hist);
       elements.entityHistory.appendChild(tag);
     });
 
     // Risks tags
     elements.entityRisks.replaceChildren();
     (entities.risks || []).forEach(risk => {
-      const tag = createElement('span', 'px-2 py-0.5 rounded bg-rose-950/70 text-rose-300 border border-rose-800/80 text-[10px] font-mono font-semibold', `⚠ ${risk}`);
+      const tag = createElement('span', 'px-2 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200 text-xs font-medium', `⚠ ${risk}`);
       elements.entityRisks.appendChild(tag);
     });
 
@@ -340,22 +372,26 @@ const UI = (() => {
       elements.conflictsContainer.classList.add('hidden');
     }
 
-    // 9. Evidence & Verification List
+    // 9. Evidence & Verification List (Clearly distinguishing Claims, Inferences, and External Evidence)
     elements.verificationList.replaceChildren();
     const verifications = plan.verification || [];
 
     if (verifications.length === 0) {
-      const noVer = createElement('p', 'text-slate-500 italic text-[11px]', 'No external factual claims required independent retrieval.');
+      const noVer = createElement('p', 'text-slate-500 italic text-[11px] p-2 bg-slate-50 rounded border border-slate-200', 'No external factual claims required independent retrieval.');
       elements.verificationList.appendChild(noVer);
     } else {
       verifications.forEach((v, idx) => {
-        const card = createElement('div', 'p-2.5 rounded-lg bg-slate-900 border border-slate-800 space-y-1.5');
+        const card = createElement('div', 'p-3 rounded-md bg-white border border-slate-200 space-y-2 shadow-2xs');
         
-        // Header line: claim and status badge
+        // 1. Claim Header Row: Label, Claim Text, and Grounding Status Badge
         const topRow = createElement('div', 'flex items-start justify-between gap-2');
-        const claimText = createElement('p', 'font-medium text-slate-200 text-xs flex-1', `${idx + 1}. ${v.claim}`);
+        const claimBlock = createElement('div', 'flex-1 space-y-0.5');
+        const claimLabel = createElement('span', 'text-[10px] font-mono uppercase tracking-wider text-slate-400 font-semibold block', `Reported Assertion #${idx + 1}:`);
+        const claimText = createElement('p', 'font-medium text-slate-900 text-xs leading-snug', `"${v.claim}"`);
+        claimBlock.appendChild(claimLabel);
+        claimBlock.appendChild(claimText);
         
-        const statusSpan = createElement('span', 'text-[10px] font-mono px-2 py-0.5 rounded shrink-0 uppercase tracking-wider font-semibold');
+        const statusSpan = createElement('span', 'text-[11px] font-mono px-2 py-0.5 rounded shrink-0 uppercase tracking-wider font-semibold mt-0.5');
         const statusLower = (v.status || '').toLowerCase();
         
         if (statusLower === 'verified') {
@@ -372,41 +408,63 @@ const UI = (() => {
           statusSpan.textContent = '⊘ Not independently verified';
         }
 
-        topRow.appendChild(claimText);
+        topRow.appendChild(claimBlock);
         topRow.appendChild(statusSpan);
         card.appendChild(topRow);
 
-        // Explanation if present
+        // 2. Model Assessment / Inference
         if (v.explanation) {
-          const exp = createElement('p', 'text-[11px] text-slate-400 pl-2 border-l border-slate-700', v.explanation);
-          card.appendChild(exp);
+          const expBox = createElement('div', 'text-xs text-slate-600 pl-2.5 py-1 border-l-2 border-slate-300 bg-slate-50/70 rounded-r');
+          const expLabel = createElement('span', 'text-[10px] uppercase font-semibold text-slate-500 tracking-wider block', 'Model Assessment:');
+          const expText = createElement('p', 'text-slate-700 leading-snug', v.explanation);
+          expBox.appendChild(expLabel);
+          expBox.appendChild(expText);
+          card.appendChild(expBox);
         }
 
-        // Real Evidence Grounding Citations
-        if (Array.isArray(v.evidence) && v.evidence.length > 0) {
-          const evContainer = createElement('div', 'mt-1 pt-1 border-t border-slate-800 space-y-1');
-          v.evidence.forEach(ev => {
-            const evRow = createElement('div', 'text-[10px] font-mono text-slate-400 flex flex-col gap-0.5 bg-slate-950/60 p-1.5 rounded');
-            
-            const srcTitle = createElement('span', 'font-semibold text-slate-300', `Source: ${ev.source || 'Public Web'}`);
-            evRow.appendChild(srcTitle);
+        // 3. Independently Retrieved Evidence (Show working link only when real HTTP/HTTPS URL exists)
+        const hasEvidence = Array.isArray(v.evidence) && v.evidence.length > 0;
+        if (hasEvidence) {
+          const evContainer = createElement('div', 'mt-1 pt-1.5 border-t border-slate-100 space-y-1.5');
+          const evHeader = createElement('span', 'text-[10px] font-semibold uppercase tracking-wider text-slate-500 block', 'Independently Retrieved Evidence:');
+          evContainer.appendChild(evHeader);
 
-            if (ev.url) {
-              const link = createElement('a', 'text-cyan-400 hover:underline truncate', ev.url);
+          v.evidence.forEach(ev => {
+            const evRow = createElement('div', 'text-[11px] text-slate-600 flex flex-col gap-1 bg-slate-50 border border-slate-200/80 p-2 rounded');
+            
+            const srcTitle = createElement('div', 'flex items-center justify-between gap-2 flex-wrap');
+            const titleSpan = createElement('span', 'font-semibold text-slate-800 text-xs', `Source: ${ev.source || 'Public Grounding Record'}`);
+            srcTitle.appendChild(titleSpan);
+
+            // Working link ONLY if valid http/https URL is available
+            const isValidHttpUrl = typeof ev.url === 'string' && (ev.url.startsWith('http://') || ev.url.startsWith('https://'));
+            if (isValidHttpUrl) {
+              const link = createElement('a', 'text-blue-600 hover:underline truncate inline-flex items-center gap-1 font-mono text-[10px]', `${ev.url} ↗`);
               link.href = ev.url;
               link.target = '_blank';
               link.rel = 'noopener noreferrer';
-              evRow.appendChild(link);
+              srcTitle.appendChild(link);
+            } else {
+              const unlinked = createElement('span', 'text-[10px] text-slate-400 italic', '(No public URL available)');
+              srcTitle.appendChild(unlinked);
             }
+            evRow.appendChild(srcTitle);
 
             if (ev.snippet) {
-              const snip = createElement('span', 'italic text-slate-400', `"${ev.snippet.slice(0, 150)}..."`);
+              const snip = createElement('p', 'italic text-slate-500 text-[11px] leading-snug pl-1.5 border-l border-slate-300', `"${ev.snippet.slice(0, 200)}"`);
               evRow.appendChild(snip);
             }
 
             evContainer.appendChild(evRow);
           });
           card.appendChild(evContainer);
+        } else {
+          const noEv = createElement('div', 'text-[11px] text-slate-500 bg-slate-50 border border-slate-100 p-2 rounded italic flex items-center gap-1.5');
+          const evIcon = createElement('span', 'text-slate-400', 'ℹ');
+          const evText = createElement('span', '', 'Independent Grounding: No external authoritative citation available. Status remains Not independently verified.');
+          noEv.appendChild(evIcon);
+          noEv.appendChild(evText);
+          card.appendChild(noEv);
         }
 
         elements.verificationList.appendChild(card);
@@ -417,9 +475,9 @@ const UI = (() => {
     elements.humanGuidanceList.replaceChildren();
     const guidance = plan.humanGuidance || [];
     guidance.forEach((step, i) => {
-      const li = createElement('li', 'flex items-start gap-2 p-2 rounded bg-slate-950/50 border border-emerald-900/40');
-      const stepNum = createElement('span', 'h-5 w-5 rounded-full bg-emerald-950 text-emerald-400 text-[10px] font-mono font-bold flex items-center justify-center shrink-0 mt-0.5 border border-emerald-700', String(i + 1));
-      const stepText = createElement('p', 'text-xs text-slate-200 leading-snug', step);
+      const li = createElement('li', 'flex items-start gap-2.5 p-2.5 rounded-md bg-slate-50 border border-slate-200');
+      const stepNum = createElement('span', 'h-5 w-5 rounded-full bg-slate-200 text-slate-700 text-xs font-semibold flex items-center justify-center shrink-0 mt-0.5', String(i + 1));
+      const stepText = createElement('p', 'text-xs text-slate-800 leading-snug', step);
       li.appendChild(stepNum);
       li.appendChild(stepText);
       elements.humanGuidanceList.appendChild(li);
@@ -429,20 +487,20 @@ const UI = (() => {
     elements.actionsList.replaceChildren();
     const actions = plan.actions || [];
     actions.forEach((act, i) => {
-      const card = createElement('div', 'action-card rounded-lg p-3 space-y-2');
+      const card = createElement('div', 'action-card rounded-md p-3.5 space-y-2');
       if (act.priority === 'Critical') card.className += ' action-critical';
       else if (act.priority === 'High') card.className += ' action-high';
 
       // Top row: Step and priority badge
       const headerRow = createElement('div', 'flex items-start justify-between gap-2');
-      const stepTitle = createElement('h4', 'font-semibold text-xs text-slate-100 flex-1 leading-snug', `${i + 1}. ${act.step}`);
+      const stepTitle = createElement('h4', 'font-semibold text-xs text-slate-900 flex-1 leading-snug', `${i + 1}. ${act.step}`);
       
       const priorityPill = createElement(
         'span',
-        `text-[10px] font-mono px-2 py-0.5 rounded font-bold uppercase ${
-          act.priority === 'Critical' ? 'bg-rose-950 text-rose-300 border border-rose-800' :
-          act.priority === 'High' ? 'bg-amber-950 text-amber-300 border border-amber-800' :
-          'bg-slate-800 text-slate-300 border border-slate-700'
+        `text-[11px] font-mono px-2 py-0.5 rounded font-medium uppercase ${
+          act.priority === 'Critical' ? 'bg-rose-50 text-rose-700 border border-rose-200' :
+          act.priority === 'High' ? 'bg-amber-50 text-amber-800 border border-amber-200' :
+          'bg-slate-100 text-slate-700 border border-slate-200'
         }`,
         act.priority || 'Normal'
       );
@@ -452,14 +510,14 @@ const UI = (() => {
       card.appendChild(headerRow);
 
       // Why / Rationale
-      const whyRow = createElement('p', 'text-[11px] text-slate-300', `Why: ${act.why}`);
+      const whyRow = createElement('p', 'text-xs text-slate-600', `Why: ${act.why}`);
       card.appendChild(whyRow);
 
       // Meta Footer: Timing, Target System, Draft Status
-      const metaRow = createElement('div', 'flex items-center justify-between gap-2 text-[10px] font-mono text-slate-400 pt-1 border-t border-slate-800/80');
+      const metaRow = createElement('div', 'flex items-center justify-between gap-2 text-[11px] text-slate-500 pt-2 border-t border-slate-100');
       const timingSpan = createElement('span', '', `⏱ Timing: ${act.timing || 'Immediate'}`);
       
-      const draftBadge = createElement('span', 'px-1.5 py-0.5 rounded bg-slate-900 border border-slate-800 text-amber-400 font-semibold', 'DRAFT ACTION');
+      const draftBadge = createElement('span', 'px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-600 font-medium text-[10px]', 'DRAFT ACTION');
       
       metaRow.appendChild(timingSpan);
       metaRow.appendChild(draftBadge);
