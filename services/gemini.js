@@ -2,7 +2,7 @@
  * SAARTHI AI — Google Gemini REST Client
  * 
  * Interacts directly with Google's official Gemini REST API.
- * Model: configured via GEMINI_MODEL env var (default: gemini-3.1-flash-lite)
+ * Model: configured via GEMINI_MODEL env var (default: gemini-3.5-flash-lite)
  * API: https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent
  * 
  * Features:
@@ -16,7 +16,7 @@
 const { validateAndNormalizeGeminiOutput } = require('./validate');
 const { VerificationAdapter } = require('./verification');
 
-const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite';
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite';
 const GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 const REQUEST_TIMEOUT_MS = 28000;
 

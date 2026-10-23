@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
     state.mode = 'live';
     UI.setModeVisuals('live');
     elements.errorBanner.classList.add('hidden');
-    UI.showToast('Switched to Live Gemini 2.5 Flash mode.', 'info');
+    UI.showToast('Switched to Live Gemini mode.', 'info');
   });
 
   elements.modeDemoBtn.addEventListener('click', () => {
@@ -80,8 +80,8 @@ document.addEventListener('DOMContentLoaded', () => {
     UI.setModeVisuals('demo');
     elements.errorBanner.classList.add('hidden');
     UI.showToast('Switched to Demo Mode.', 'info');
-    // If there's input, trigger analyze automatically
-    if (elements.inputText.value.trim().length >= 3) {
+    // If there's text or image input, trigger analyze automatically
+    if (elements.inputText.value.trim().length >= 3 || (state.uploadedImage && state.uploadedImage.data)) {
       handleAnalyze();
     }
   });

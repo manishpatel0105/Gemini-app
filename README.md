@@ -59,7 +59,7 @@ graph TD
 | :--- | :--- |
 | **Runtime Dependencies** | **Zero runtime npm dependencies**. Powered entirely by Node.js built-ins (`http`, `fs`, `path`, `crypto`, native `fetch`). |
 | **Repository Size** | **~241 KB** total working tree size (Strict limit: < 10 MB). Uses `scripts/repo-size.js` for automated audit. |
-| **Model** | **Google Gemini Flash Lite** (default: `gemini-3.1-flash-lite`, configurable via `GEMINI_MODEL` env var) via official Google REST API (`x-goog-api-key`). |
+| **Model** | **Google Gemini Flash Lite** (default: `gemini-3.5-flash-lite`, configurable via `GEMINI_MODEL` env var) via official Google REST API (`x-goog-api-key`). |
 | **Multimodal** | Audio speech recognition via browser Web Speech API (`en-IN`, `hi-IN`); scene photos up to 4 MB (PNG, JPEG, WEBP) with binary magic byte validation. |
 | **API Key Privacy** | `GEMINI_API_KEY` is exclusively read on the server. Never leaked to client code, Git, or API responses. |
 | **Judge Demo Mode** | Full offline exploration mode with deterministic high-fidelity fixtures in `public/demoData.js`. Persistent warning banner displayed. |

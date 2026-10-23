@@ -156,7 +156,7 @@ function findMatchingDemoPreset(inputText = '', context = 'auto') {
   if (context === 'community_safety' || text.includes('weather') || text.includes('storm') || text.includes('flood') || text.includes('minto') || text.includes('underpass') || text.includes('tree') || text.includes('wire') || text.includes('road')) {
     return DEMO_PRESETS.community_safety.plan;
   }
-  if (text.includes('chest') || text.includes('pain') || text.includes('heart') || text.includes('stemi') || text.includes('khed') || text.includes('toll')) {
+  if (context === 'emergency_crisis' || text.includes('chest') || text.includes('pain') || text.includes('heart') || text.includes('stemi') || text.includes('khed') || text.includes('toll')) {
     return DEMO_PRESETS.medical_crisis.plan;
   }
 
@@ -261,7 +261,7 @@ function createServer() {
         status: 'ok',
         application: 'SAARTHI AI',
         version: '1.0.0',
-        model: process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite',
+        model: process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite',
         mode: hasApiKey ? 'live' : 'demo',
         hasApiKey,
         timestamp: new Date().toISOString(),
@@ -374,7 +374,7 @@ if (require.main === module) {
     const hasKey = Boolean(process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY.trim());
     console.log(`\n======================================================`);
     console.log(`  🛡️  SAARTHI AI — Universal Human Intent Engine`);
-    console.log(`  Model: Google Gemini (${process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite'})`);
+    console.log(`  Model: Google Gemini (${process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite'})`);
     console.log(`  Status: Operational on http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT}`);
     console.log(`  Mode: ${hasKey ? '🟢 LIVE (API key configured)' : '🟡 DEMO MODE (API key not configured)'}`);
     console.log(`======================================================\n`);
